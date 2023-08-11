@@ -11,7 +11,7 @@ This is a web application designed to manage and track issues using GitHub-like 
 
 ## Tech Stack
 
-- Frontend: Vue.js
+- Frontend: Vue.js (Css framworks (bootstrap,tailwindCss) )
 - Backend: Node.js with Express
 - Database: MySQL
 
@@ -19,16 +19,16 @@ This is a web application designed to manage and track issues using GitHub-like 
 
 ### Frontend
 
-1. Navigate to the `frontend` directory.
+1. Navigate to the `Issue-Trackr-Pro-clientSide` directory.
 2. Run `npm install` to install dependencies.
 3. Run `npm run serve` to start the development server.
 
 ### Backend
 
-1. Navigate to the `backend` directory.
+1. Navigate to the `Issue-Trackr-pro-serverSide` directory.
 2. Run `npm install` to install dependencies.
 3. Set up your MySQL database and update `.env` with the database details.
-4. Run `npm run start` to start the backend server.
+4. Run `npm start` to start the backend server using (nodemone).
 
 ## Contributing
 
