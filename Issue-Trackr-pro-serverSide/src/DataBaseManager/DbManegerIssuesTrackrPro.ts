@@ -1,7 +1,11 @@
-const mysql = require('mysql2/promise');
+
+
+
+
+const mysql2 = require('mysql2/promise');
 
 async function createDatabase() {
-  const connection = await mysql.createConnection({
+  const connection = await mysql2.createConnection({
     host: '127.0.0.1', // Change this to your MySQL host
     user: 'root',
     password: ''
@@ -17,7 +21,7 @@ async function createDatabase() {
 
 
 async function changeTableNames() {
-    const connection = await mysql.createConnection({
+    const connection = await mysql2.createConnection({
         host: '127.0.0.1', // Change this to your MySQL host
     user: 'root',
     password: '',
@@ -32,7 +36,7 @@ async function changeTableNames() {
 
 
 async function createSchema() {
-    const connection = await mysql.createConnection({
+    const connection = await mysql2.createConnection({
       host: '127.0.0.1', // Change this to your MySQL host
       user: 'root',
       password: '',

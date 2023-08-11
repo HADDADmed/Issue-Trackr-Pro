@@ -1,6 +1,8 @@
 import express, { Application, Request, Response } from "express";
-import bodyParser from "body-parser";
-
+import bodyParser from "body-parser"
+import { ticketsRouter } from "./routers/tickets.router";
+import { usersRouter } from "./routers/users.router";
+const connection = require('./DataBaseManager/dbConnection'); // Adjust the path as needed
 const app: Application = express();
 
 app.use(bodyParser.json());
@@ -10,27 +12,24 @@ var cors = require('cors');
 app.use(cors());
 
 
-var mysql = require('mysql');
-
-
-var connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "IssueTrackrPro"
-});
-
 connection.connect(function (err: any) {
   if (err) throw err;
-  console.log("Connected!");
+  console.log("Connected successfuly to MySql !");
 });
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Healthy");
-});
+
+
+
+app.use('/api/tickets', ticketsRouter);
+app.use('/api/users', usersRouter);
+
+
+
+
+
+
 
 const PORT = process.env.PORT || 8000;
-
 app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT}`);
 });
