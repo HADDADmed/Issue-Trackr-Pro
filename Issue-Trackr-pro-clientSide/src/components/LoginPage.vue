@@ -1,5 +1,8 @@
 <script >
 import anime from 'animejs'; // Make sure you have animejs installed
+import axios from 'axios';
+import { ref } from 'vue';
+import router from '../router';
 export default {
   data() {
     return {
@@ -66,21 +69,35 @@ export default {
       }
     },
     async login() {
-      try {
-        const response = await this.$http.post('http://localhost:8000/login', {
+
+          console.log('test1')
+          console.log(this.mail)
+          console.log(this.password)
+          try {
+          console.log('test2')
+          const response = await axios.post('http://localhost:8000/api/users/login', {
           email: this.mail,
-          password: this.password,
-        });
-        console.log('logged in !')
-        console.log(this.mail)
-        console.log(this.password)
-        console.log(response)
-        localStorage.setItem('token', response.data.token);
-        this.$router.push('/home');
-      } catch (error) {
-        this.errorMessage = error.response.data.message;
-      }
-    },
+          password: this.password
+          })
+          console.log ('logged in !')
+          console.log(this.mail)
+          console.log(this.password)
+          console.log(response)
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+          localStorage.setItem('token', response.data.token);
+             router.push('/home');
+          if (response.status === 200) {
+          this.errorMessage = '';
+          // Redirect to a new page or perform some action upon successful login
+          }
+          } catch (error) {
+          if (error.response) {
+          this.errorMessage = error.response.data.error;
+          } else {
+          this.errorMessage = 'An error occurred';
+          }
+          }
+}
   },
 };
 </script>
@@ -93,7 +110,8 @@ export default {
     <div class="left">
       <div class="login">Login to IssuesTrackrPro</div>
       <div class="eula">Welcome to IssuesTrackerPro! Log in to manage and track your project issues efficiently. <br> By logging in you agree to our terms and conditions.</div>
-      
+      tt<p v-if="errorMessage"> {{ errorMessage }}</p>
+
     </div>
     <div class="right">
       <svg viewBox="0 0 320 300">
@@ -120,10 +138,10 @@ export default {
       </svg>
       <div class="form">
         <label for="email" >Email</label>
-        <input type="email" @focus="handleFocus('email')" id="email">
+        <input type="email" @focus="handleFocus('email')"  v-model="mail"  id="email">
         <label for="password">Password</label>
-        <input type="password" @focus="handleFocus('password')" id="password">
-        <input type="submit" id="submit"  @focus="handleFocus('submit')" value="Submit">
+        <input type="password" @focus="handleFocus('password')"   v-model="password"  id="password">
+        <input type="submit" id="submit"  @focus="handleFocus('submit')" value="Submit"  @click="login()">
       </div>
     </div>
   </div>

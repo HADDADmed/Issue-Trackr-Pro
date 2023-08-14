@@ -2,11 +2,9 @@
 <script setup>
 import { ref } from 'vue';
 import { collapsed, toggleSidebar, sidebarWidth } from '@/components/sidebar/state.js';
-import { useRouter } from 'vue-router'; // Import from 'vue-router' not 'vue'
 
 const isNavbarOpen = ref(false);
 const isDropdownOpen = ref(false);
-const router = useRouter(); // Use useRouter instead of useRoute
 
 function toggleNavbar() {
   isNavbarOpen.value = !isNavbarOpen.value;
@@ -15,18 +13,11 @@ function toggleNavbar() {
 function toggleDropdown() {
   isDropdownOpen.value = !isDropdownOpen.value;
 }
-
-function logOut() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  router.push({ name: 'home' });
-}
 </script>
 
 
-
 <template>
-  <div :style="{ 'margin-left': sidebarWidth }">
+  <div >
     <nav style="background-color: #1f4e7a;" class="navbar navbar-expand-lg navbar-dark ">
       
       <div style="display: flex; justify-content: end;" class="collapse navbar-collapse" :class="{ 'show': isNavbarOpen }" id="navbarSupportedContent">
@@ -36,8 +27,8 @@ function logOut() {
                 <img style="width: 40px;" src="./accountLogo.png" alt="logo">
               </a>
               <div class="dropdown-menu" :class="{ 'show': isDropdownOpen }" aria-labelledby="navbarDropdown">
-                
-                <a class="dropdown-item" @click="logOut()">logOut</a>
+                <a class="dropdown-item" href="/login">Login</a>
+               
               </div>
             </li>
         </ul>

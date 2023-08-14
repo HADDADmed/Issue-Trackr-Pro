@@ -19,12 +19,8 @@ connection.connect(function (err: any) {
 
 
 
-
 app.use('/api/tickets', ticketsRouter);
 app.use('/api/users', usersRouter);
-
-
-
 
 
 

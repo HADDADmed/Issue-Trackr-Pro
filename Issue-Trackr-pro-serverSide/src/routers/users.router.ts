@@ -16,9 +16,48 @@ dotenv.config();
 router.get('/', (req: any, res: any) => {
     console.log("Get all users");
 
-  res.send("Get all users");
+    const selectQuery = 'SELECT * FROM user';
+
+    connection.query(selectQuery, (err: any, results: any) => {
+
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+
+        res.status(200).json(results);
+    }
+    );
+
 }
 );
+
+ //get users by role
+router.get('/role/:role', (req: any, res: any) => {
+
+    console.log("Get users by role");
+    const { role } = req.params;
+    const selectQuery = 'SELECT * FROM user WHERE role = ?';
+
+    connection.query(selectQuery, [role], (err: any, results: any) => {
+
+
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+          console.log({ message: 'Get users by role  success :' , results});
+        res.status(200).json(results);
+    }
+    );
+
+}
+);
+
+
+
 
 // Get user by id
 router.get('/:id', (req: any, res: any) => {
