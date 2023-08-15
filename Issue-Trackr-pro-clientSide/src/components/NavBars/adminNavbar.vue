@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router'; // Import from 'vue-router' not 'vue'
 const isNavbarOpen = ref(false);
 const isDropdownOpen = ref(false);
 const router = useRouter(); // Use useRouter instead of useRoute
+const user = ref(JSON.parse(localStorage.getItem('user')));
 
 function toggleNavbar() {
   isNavbarOpen.value = !isNavbarOpen.value;
@@ -30,11 +31,14 @@ function logOut() {
     <nav style="background-color: #1f4e7a;" class="navbar navbar-expand-lg navbar-dark ">
       
       <div style="display: flex; justify-content: end;" class="collapse navbar-collapse" :class="{ 'show': isNavbarOpen }" id="navbarSupportedContent">
+        <a style="font-size: 15px;" class="navbar-brand "  href="#">{{user.fullName}} <span style="color: red;">ADMIN</span></a>
+
         <ul class="navbar-nav">
             <li style="margin-right: 50px;" class="nav-item dropdown">
               <a  href="#" id="navbarDropdown" role="button" @click="toggleDropdown" aria-haspopup="true" aria-expanded="false">
                 <img style="width: 40px;" src="./accountLogo.png" alt="logo">
               </a>
+  
               <div class="dropdown-menu" :class="{ 'show': isDropdownOpen }" aria-labelledby="navbarDropdown">
                 
                 <a class="dropdown-item" @click="logOut()">logOut</a>

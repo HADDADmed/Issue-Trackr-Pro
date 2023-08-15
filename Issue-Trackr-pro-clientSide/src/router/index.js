@@ -6,6 +6,10 @@ import AdminHomePage from '../views/AdminHomePageVue.vue'
 import ResponsibleHomePage from '../views/ResponsibleHomePageVue.vue'
 import NotAuthenticatedHomePage from '../views/NotAuthenticatedHomePageVue.vue'
 import AdminHomeresp from '../views/AdminHomeresp.vue'
+import TickestsList from '../views/TicketsListVue.vue'
+import TicketsAdd from '../views/TicketsAddVue.vue'
+
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -39,7 +43,15 @@ const router = createRouter({
       path: '/homeadminresponsibles',
       name: 'AdminHomePageResponsibles',
       component: AdminHomeresp
-    },
+    },{
+      path: '/ticketlist',
+      name: 'ticketlist',
+      component: TickestsList
+    },{
+      path: '/ticketsadd/:id',
+      name: 'ticketsadd',
+      component: TicketsAdd
+    }
   ]
 })
 

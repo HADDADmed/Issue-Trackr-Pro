@@ -26,24 +26,25 @@ import { collapsed, toggleSidebar, sidebarWidth } from './state'
       <div v-if="whosAuthenticated == 'USER'">
     
   <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/" icon="fas fa-users">MainhomePage</SidebarLink>
-<SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homeuser" icon="fas fa-home">homeuser</SidebarLink>
-<SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homeadmin" icon="fas fa-columns">homeadmin</SidebarLink>
-<SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homeresponsible" icon="fas fa-chart-bar">homeresponsible</SidebarLink>
-<SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homenotauthenticated" icon="fas fa-users">notauthenticated</SidebarLink>
+
+
+<SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketlist" icon="fas fa-columns">List Of All Issues</SidebarLink>
 <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/login" icon="fas fa-image">login</SidebarLink>
       </div>
       <div v-else-if="whosAuthenticated == 'ADMIN'">
     
     <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/" icon="fas fa-users">Liste Of Users </SidebarLink>
   <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homeadminresponsibles" icon="fas fa-home">List of Rspsibles</SidebarLink>
-  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homeadmin" icon="fas fa-columns">List Of All Issues</SidebarLink>
-  <SidebarLink style="margin-left: -10px; margin-top: 50px;" to="/logoutpl" icon="fas fa-chart-bar">Logout</SidebarLink>
+
+  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketlist" icon="fas fa-columns">List Of All Issues</SidebarLink>
+  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketsadd/0" icon="fas fa-columns">Add New Tickets</SidebarLink>
+  <SidebarLink style="margin-left: -10px; margin-top: 50px;" to="/" icon="fas fa-chart-bar">Logout</SidebarLink>
 
         </div>
         <div v-if="whosAuthenticated == 'RESPONSIBLE'">
     
     <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/" icon="fas fa-users">MainhomePage</SidebarLink>
-  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homeuser" icon="fas fa-home">homeuser</SidebarLink>
+  
   <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homeadmin" icon="fas fa-columns">homeadmin</SidebarLink>
   <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homeresponsible" icon="fas fa-chart-bar">homeresponsible</SidebarLink>
   <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homenotauthenticated" icon="fas fa-users">notauthenticated</SidebarLink>
@@ -84,30 +85,63 @@ import { collapsed, toggleSidebar, sidebarWidth } from './state'
   bottom: 0;
   padding: 0.5em;
 
+  /* Enable scrolling and hide the scrollbar */
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+
   transition: 0.3s ease;
 
   display: flex;
   flex-direction: column;
 }
 
+/* Hide the scrollbar for WebKit browsers */
+.sidebar::-webkit-scrollbar {
+  width: 0.5em;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+
 .sidebar h1 {
   height: 2.5em;
 }
 
 .collapse-icon {
-  position: absolute;
+  position: sticky; /* Use sticky positioning */
   bottom: 0;
-  left: 0;
-  padding: 0.75em;
+  left: 100px;
+  padding: 0.70em;
 
-  color: rgba(255, 255, 255, 0.7);
+  color: red;
 
-  transition: 0.2s linear;
+  /* Add a white rounded contour */
+  border: 4px solid white;
+  border-radius: 50%;
+
+  /* Center the icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Ensure a perfect circle */
+  width: 1.5em;
+  height: 1.5em;
+
+  /* Transition and other styles */
+  transition: 0.3s linear;
 }
 
 .rotate-180 {
   transform: rotate(180deg);
-  transition: 0.2s linear;
+  transition: 0.3s linear;
 }
 
 </style>

@@ -85,6 +85,10 @@ export default {
           console.log(response)
           localStorage.setItem('user', JSON.stringify(response.data.user));
           localStorage.setItem('token', response.data.token);
+          //set whosAuthenticated to the local storage
+          localStorage.setItem('whosAuthenticated', JSON.stringify(response.data.user.role));
+          const whosAuthenticated = localStorage.getItem('whosAuthenticated');
+          console.log("whosAuthenticated From Login: " + whosAuthenticated); 
              router.push('/home');
           if (response.status === 200) {
           this.errorMessage = '';

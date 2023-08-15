@@ -2,6 +2,14 @@
 <script setup>
 import { ref } from 'vue';
 import { collapsed, toggleSidebar, sidebarWidth } from '@/components/sidebar/state.js';
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+//user from local storage
+
+const user = ref(JSON.parse(localStorage.getItem('user')));
+
+console.log(user.value);
 
 const isNavbarOpen = ref(false);
 const isDropdownOpen = ref(false);
@@ -13,6 +21,11 @@ function toggleNavbar() {
 function toggleDropdown() {
   isDropdownOpen.value = !isDropdownOpen.value;
 }
+function logOut() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  router.push({ name: 'home' });
+}
 </script>
 
 
@@ -21,16 +34,15 @@ function toggleDropdown() {
     <nav style="background-color: #1f4e7a;" class="navbar navbar-expand-lg navbar-dark ">
       
       <div style="display: flex; justify-content: end;" class="collapse navbar-collapse" :class="{ 'show': isNavbarOpen }" id="navbarSupportedContent">
+        <a style="font-size: 15px;" class="navbar-brand "  href="#">{{user.fullName}}</a>
         <ul class="navbar-nav">
             <li style="margin-right: 50px;" class="nav-item dropdown">
               <a  href="#" id="navbarDropdown" role="button" @click="toggleDropdown" aria-haspopup="true" aria-expanded="false">
                 <img style="width: 40px;" src="./accountLogo.png" alt="logo">
               </a>
               <div class="dropdown-menu" :class="{ 'show': isDropdownOpen }" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Something else here</a>
+                
+                <a class="dropdown-item" @click="logOut()">logOut</a>
               </div>
             </li>
         </ul>
