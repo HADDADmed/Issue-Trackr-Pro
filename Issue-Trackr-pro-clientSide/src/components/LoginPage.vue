@@ -114,7 +114,7 @@ export default {
     <div class="left">
       <div class="login">Login to IssuesTrackrPro</div>
       <div class="eula">Welcome to IssuesTrackerPro! Log in to manage and track your project issues efficiently. <br> By logging in you agree to our terms and conditions.</div>
-      tt<p v-if="errorMessage"> {{ errorMessage }}</p>
+      <p style="color: red; text-align: center;  margin-top:-10px;font-size:20px;" v-if="errorMessage"> {{ errorMessage }}</p>
 
     </div>
     <div class="right">

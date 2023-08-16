@@ -25,29 +25,32 @@ function  toTicketList(){
 <template>
     <Sidebar></Sidebar>
     
-     
     <!-- list of Normal users  -->
-    <div style="margin: 40px 40px 40px 0px; " :style="{ 'margin-left': sidebarWidthNumf() }" >
+    <div  :style="{ 'margin-left': sidebarWidthNumf() }" >
+      <section class="bg">
               <div id="app">
+                <div style="margin: 40px 40px 40px 0px; ">
               <h1>HELLO  <strong style="color: red;">{{ user.fullName}}</strong>  👋</h1>
               <h1>Welcome to your workSpace</h1>
 
-              <div class="d-flex justify-content-around" >
+              <div style="margin-top: 50px;" class="d-flex justify-content-around" >
               <button type="button" @click="toTicketAdd()" class="btn btn-primary">Add New Ticket</button>
               <button type="button" @click="toTicketList()" class="btn btn-secondary">Display All Tickets</button>
               </div>
-
+              </div>
                 </div>
+              </section>
     </div>
 </template>
 
 <style scoped>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+
+.bg {
+
+  background-size: cover;
+ 
   text-align: center;
-  color: #2c3e50;
+  padding: 150px;
 }
 
 </style>

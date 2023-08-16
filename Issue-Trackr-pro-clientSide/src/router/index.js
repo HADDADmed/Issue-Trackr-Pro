@@ -8,6 +8,7 @@ import NotAuthenticatedHomePage from '../views/NotAuthenticatedHomePageVue.vue'
 import AdminHomeresp from '../views/AdminHomeresp.vue'
 import TickestsList from '../views/TicketsListVue.vue'
 import TicketsAdd from '../views/TicketsAddVue.vue'
+import TicketDetaills from '../views/TicketDetaillsVue.vue'
 
 
 const router = createRouter({
@@ -51,6 +52,10 @@ const router = createRouter({
       path: '/ticketsadd/:id',
       name: 'ticketsadd',
       component: TicketsAdd
+    },{
+      path: '/ticketdetaills/:id',
+      name: 'TicketDetaills',
+      component: TicketDetaills
     }
   ]
 })

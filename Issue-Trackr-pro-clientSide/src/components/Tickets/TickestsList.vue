@@ -5,6 +5,10 @@ import Sidebar from '../sidebar/Sidebar.vue';
 
 import { ref, onMounted } from 'vue';
 import { sidebarWidthNum } from '../sidebar/state';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 
 function sidebarWidthNumf() {
@@ -43,6 +47,18 @@ console.log("localStorage.getItem('token'): " + localStorage.getItem('token'));
 console.log("localStorage.getItem('user'): " + localStorage.getItem('user'));
 // console.log("localStorage.getItem('user').role: " + JSON.parse(localStorage.getItem('user')).role);
 
+
+//delete Ticket from Database 
+
+function deleteTicket(ticketId)
+
+{
+   const response = axios.delete('http://localhost:8000/api/tickets/'+ticketId);
+    console.log('Deleted succefuly')
+    router.push('/');
+
+}
+
 const props = defineProps({
      addORedit: {
          type: String,
@@ -54,7 +70,7 @@ const props = defineProps({
 
 <div id="app">
     <Sidebar></Sidebar>
-   <MainNavBar :whosAuthenticated=ADMIN></MainNavBar> 
+   <MainNavBar></MainNavBar> 
 
     <div style="margin: 40px 40px 40px 0px; " :style="{ 'margin-left': sidebarWidthNumf() }" >
 
@@ -88,7 +104,8 @@ const props = defineProps({
                 <table class="table">
                 <thead class="thead-light">
                                                
-                                    <tr>
+                                    <tr style="border: 10px;"  >
+                                    <th scope="col">NavTo</th>
                                     <th scope="col">#ticket_id</th>
                                     <th scope="col">#user_Id</th>
                                     <th scope="col">#Category_Id</th>
@@ -96,18 +113,42 @@ const props = defineProps({
                                     <th colspan="3" scope="col">Content</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">createdAt</th>
+                                    <th scope="col">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 
-                                    <tr v-for="issue in issues" >
-                                    <th scope="row">{{ issue.id }}</th>
-                                    <th scope="row">{{ issue.user_id }}</th>
-                                    <td>{{issue.category_id}}</td>
-                                    <td>{{issue.title}}</td>
-                                    <td colspan="3">{{issue.description}}</td>
-                                    <td>{{ issue.status }}</td>
-                                    <td>{{formatDate(issue.createdAt ) }}</td>
+                                    <tr v-for="issue in issues" style="border: 10px;">
+                                       <td scope="row">
+                                            <a style="width: 30px; height: 30px;" class="btn btn-success rounded-circle" :href="'ticketdetaills/' + issue.id"> 
+                                                <div style="font-size: 18px; display: flex; justify-content: center;">
+                                              <i class="fa-brands fa-searchengin"></i>
+
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <th scope="row">{{ issue.id }}</th>
+                                        <th scope="row">{{ issue.user_id }}</th>
+                                        <td>{{issue.category_id}}</td>
+                                        <td>{{issue.title}}</td>
+                                        <td colspan="3">{{issue.description}}</td>
+                                        <td>{{ issue.status }}</td>
+                                        <td>{{formatDate(issue.createdAt ) }}</td>
+                                        <td scope="row">
+                                            <div   class="d-flex justify-content-between">
+                                              <a v-if="whosAuthenticated == 'ADMIN'||whosAuthenticated == 'RESPONSIBLE'"  style="width: 30px; height: 30px;" class="btn btn-secondary rounded-circle" href="#"> 
+                                                <div style="font-size: 18px; display: flex; justify-content: center;">
+                                                    <i class="fa-regular fa-pen-to-square"></i>
+                                                </div>
+                                            </a>
+                                            <a style="width: 30px; height: 30px;" @click="deleteTicket(issue.id)" class="btn btn-danger rounded-circle" href="#"> 
+                                                <div style="font-size: 18px; display: flex; justify-content: center;">
+                                                  <i class="fa-solid fa-trash-can"></i>
+
+                                                </div>
+                                            </a>
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                 </table>

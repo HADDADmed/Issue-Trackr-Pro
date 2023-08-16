@@ -21,9 +21,9 @@ function toggleDropdown() {
     <nav style="background-color: #1f4e7a;" class="navbar navbar-expand-lg navbar-dark ">
       
       <div style="display: flex; justify-content: end;" class="collapse navbar-collapse" :class="{ 'show': isNavbarOpen }" id="navbarSupportedContent">
+        <a style="font-size: 15px;" class="navbar-brand "  href="#">Not Authenticated</a>
         <ul class="navbar-nav">
             <li style="margin-right: 50px;" class="nav-item dropdown">
-              <div>NOT authenticated</div>
               <a  href="#" id="navbarDropdown" role="button" @click="toggleDropdown" aria-haspopup="true" aria-expanded="false">
                 <img style="width: 40px;" src="./accountLogo.png" alt="logo">
               </a>

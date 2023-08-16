@@ -4,11 +4,12 @@ const express = require('express');
 const router = express.Router();
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');    
-
+const cors = require('cors'); // Import the cors package
 const JWT_SECRET_KEY = 'haddad'
   
 const TOKEN_HEADER_KEY = 'haddad'
 // Set up Global configuration acces
+
 dotenv.config();
 
 

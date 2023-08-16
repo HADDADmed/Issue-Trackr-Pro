@@ -25,11 +25,9 @@ import { collapsed, toggleSidebar, sidebarWidth } from './state'
 
       <div v-if="whosAuthenticated == 'USER'">
     
-  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/" icon="fas fa-users">MainhomePage</SidebarLink>
+  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/" icon="fas fa-users">Home Page</SidebarLink>
+  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketlist" icon="fas fa-columns">List Of All Issues</SidebarLink>
 
-
-<SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketlist" icon="fas fa-columns">List Of All Issues</SidebarLink>
-<SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/login" icon="fas fa-image">login</SidebarLink>
       </div>
       <div v-else-if="whosAuthenticated == 'ADMIN'">
     
@@ -37,18 +35,13 @@ import { collapsed, toggleSidebar, sidebarWidth } from './state'
   <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homeadminresponsibles" icon="fas fa-home">List of Rspsibles</SidebarLink>
 
   <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketlist" icon="fas fa-columns">List Of All Issues</SidebarLink>
-  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketsadd/0" icon="fas fa-columns">Add New Tickets</SidebarLink>
-  <SidebarLink style="margin-left: -10px; margin-top: 50px;" to="/" icon="fas fa-chart-bar">Logout</SidebarLink>
 
         </div>
         <div v-if="whosAuthenticated == 'RESPONSIBLE'">
     
-    <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/" icon="fas fa-users">MainhomePage</SidebarLink>
-  
-  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homeadmin" icon="fas fa-columns">homeadmin</SidebarLink>
-  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homeresponsible" icon="fas fa-chart-bar">homeresponsible</SidebarLink>
-  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homenotauthenticated" icon="fas fa-users">notauthenticated</SidebarLink>
-  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/login" icon="fas fa-image">login</SidebarLink>
+    <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/" icon="fas fa-users">Home Page </SidebarLink>
+    <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketlist" icon="fas fa-users">List Of All Issues</SidebarLink>
+
         </div>
 
 <span
@@ -119,7 +112,7 @@ import { collapsed, toggleSidebar, sidebarWidth } from './state'
   bottom: 0;
   left: 100px;
   padding: 0.70em;
-
+  margin-top: 30px;
   color: red;
 
   /* Add a white rounded contour */

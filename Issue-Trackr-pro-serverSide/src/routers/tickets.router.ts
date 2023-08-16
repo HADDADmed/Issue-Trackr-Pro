@@ -38,6 +38,28 @@ router.get('/:userid', (req: any, res: any) => {
     });
 });
 
+router.delete('/:id', (req: any, res: any) => {
+
+    console.log("Delete ticket");
+    const ticketId = req.params.id;
+    console.log("ticket_id to delete : " + ticketId);
+    const deleteQuery = 'DELETE FROM ticket WHERE id = ?';
+
+    connection.query(deleteQuery, [ticketId], (err: any, results: any) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+        console.log(" ticket Deleted succesfuly");
+        console.log(results);
+        console.log("ticket_id deleted : " + ticketId);
+        res.status(200).json(results);
+
+    });
+});
+
+
 router.post('/', (req: any, res: any) => {
     console.log("Create ticket");
     const ticketId = req.body.id;
@@ -58,12 +80,12 @@ router.post('/', (req: any, res: any) => {
                 res.status(500).json({ error: 'Internal server error' });
                 return;
             }
-            console.log("ticket created succesfuly");
+            console.log("ticket created succesfuly By the User With tickets id = 0");
             res.status(200).json(results);
         }
         );
 
-    }else if(status = 'FROM_USER')
+    }else if(status == 'FROM_USER')
     {
         //update tickets but not changing Status or historyOfStatus
         const updateQuery = 'UPDATE ticket SET title = ?, description = ?, category_id = ? WHERE id = ?';
@@ -74,12 +96,10 @@ router.post('/', (req: any, res: any) => {
                 return;
             }
 
-            console.log("Ticket updated successfully By User");
+            console.log("Ticket updated successfully By User with status == FROM_USER");
             res.status(200).json(results);
         }
         );
-
-
        
     }else {
         //fetch ticket that have ticket id 
@@ -105,7 +125,7 @@ router.post('/', (req: any, res: any) => {
                 return;
             }
     
-            console.log("Ticket updated successfully by Admin");
+            console.log("Ticket updated successfully by Admin or responible ");
             res.status(200).json(results);
         }
         );
@@ -113,6 +133,25 @@ router.post('/', (req: any, res: any) => {
     
 }
 });
+
+router.get('/ticket/:id', (req: any, res: any) => {
+
+    console.log("Get ticket by id");
+
+    const selectQuery = 'SELECT * FROM ticket WHERE id = ?';
+    const ticketId = req.params.id;
+
+    connection.query(selectQuery, [ticketId], (err: any, results: any) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+        console.log("Succes ticket id");
+        res.status(200).json(results);
+    });
+});
+
 
 
 

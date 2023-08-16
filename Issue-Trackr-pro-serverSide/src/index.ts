@@ -10,8 +10,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 var cors = require('cors');
-app.use(cors());
-
+app.use(cors({
+  origin: 'http://localhost:8000' // Adjust the origin to match your frontend URL
+}));
 
 connection.connect(function (err: any) {
   if (err) throw err;
@@ -23,6 +24,7 @@ connection.connect(function (err: any) {
 app.use('/api/tickets', ticketsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/categories', categoriesRouter);
+
 
 
 
