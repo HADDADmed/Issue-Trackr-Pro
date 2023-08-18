@@ -11,7 +11,7 @@ const user = ref(JSON.parse(localStorage.getItem('user')));
 const Categories = ref([]);
 import axios from 'axios';
 import { useRouter, useRoute } from 'vue-router';
-
+  const fromWho = ref('');
 const router = useRouter();
 const route = useRoute();
 const whosAuthenticated = ref(localStorage.getItem('token') ? JSON.parse(localStorage.getItem('user')).role : 'NOT_AUTHENTICATED');
@@ -25,6 +25,7 @@ const ticket = ref({
     category_id: '',
     status: statusT,
     user_id: '',
+    fromWho: '',
     
 });
 const ticketDb = ref({
@@ -56,6 +57,12 @@ function saveTicket() {
   console.log(ticket.value);
   if (whosAuthenticated.value == 'USER'){
     ticket.value.status = 'FROM_USER'
+    ticket.value.fromWho = 'FROM_USER'
+}else if (whosAuthenticated.value == 'ADMIN'){
+    ticket.value.fromWho = 'FROM_ADMIN'
+
+}else if (whosAuthenticated.value == 'RESPONSIBLE'){
+    ticket.value.fromWho = 'FROM_RESPONSIBLE'
 }
   // save to database using axios
   axios.post('http://localhost:8000/api/tickets', ticket.value)
@@ -165,7 +172,6 @@ function   cancel(){
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
   color: #2c3e50;
 }
 

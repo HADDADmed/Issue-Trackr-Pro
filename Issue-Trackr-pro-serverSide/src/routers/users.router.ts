@@ -103,13 +103,16 @@ router.post('/login', (req: any, res: any) => {
 });
 
 // Change user role by id
-router.put('/change-user-role/:id', (req: any, res: any) => {
+router.put('/change-user-role', (req: any, res: any) => {
 
     console.log("Change user role by id");
     
     const selecteQuery = 'UPDATE user SET role = ? WHERE id = ?';
-    const { role } = req.body;
-    const { id } = req.params;
+    const role = req.body.role;
+    const id = req.body.id;
+    console.log("role : " + role);
+    console.log("id : " + id);
+    
     connection.query(selecteQuery, [role, id], (err: any, results: any) => {
         if (err) {
             console.error('Error executing query:', err);
@@ -122,6 +125,33 @@ router.put('/change-user-role/:id', (req: any, res: any) => {
 
 }
 );
+
+
+//count number of tickets of a user 
+router.get('/count/:userId', (req: any, res: any) => {
+
+    console.log("count number of tickets of a user ");
+    const { userId } = req.params;
+    const selectQuery = 'SELECT COUNT(*) FROM ticket WHERE user_id = ?';
+
+    connection.query(selectQuery, [userId], (err: any, results: any) => {
+
+        if (err) {
+
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+        console.log({ message: 'count number of tickets of a user  success :' , results});
+        res.status(200).json(results);
+    }
+    );
+
+}
+);
+
+
+
 
 
 export const usersRouter = router;

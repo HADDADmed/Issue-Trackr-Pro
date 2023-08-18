@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const connection = require('../DataBaseManager/dbConnection'); // Adjust the path as needed
+import { format } from 'date-fns'; // Import the format function from the 'date-fns' library
 
 
 // Get all tickets
@@ -65,14 +66,17 @@ router.post('/', (req: any, res: any) => {
     const ticketId = req.body.id;
     const title = req.body.title;
     const userId = req.body.user_id;
-    const description = req.body.content;
+    var description = req.body.content;
     const categoryId = req.body.category_id;    
     const d = new Date();
-    var  status =  req.body.status;
+    const formattedDate = format(d, "dd/MM/yyyy, HH:mm:ss"); // Format the date object
+    let  status =  req.body.status;
+    const fromWho = req.body.fromWho;
 
-    if(ticketId == 0){
-        status = "Open";
-        const historyOfStatus = 'Open('+d+')';
+    if(ticketId == 0 && fromWho == 'FROM_USER'){
+        status = "OPEN";
+        description = description+'\n';
+        const historyOfStatus = '( '+status+' ) : '+formattedDate ;
         const insertQuery = 'INSERT INTO ticket (title, user_id, description, category_id, status, historyOfStatus) VALUES (?, ?, ?, ?, ?, ?)';
         connection.query(insertQuery, [title, userId, description, categoryId, status, historyOfStatus], (err: any, results: any) => {
             if (err) {
@@ -85,25 +89,43 @@ router.post('/', (req: any, res: any) => {
         }
         );
 
-    }else if(status == 'FROM_USER')
+    }else if(status == 'FROM_USER' && fromWho == 'FROM_USER')
     {
-        //update tickets but not changing Status or historyOfStatus
-        const updateQuery = 'UPDATE ticket SET title = ?, description = ?, category_id = ? WHERE id = ?';
-        connection.query(updateQuery, [title, description, categoryId, ticketId], (err: any, results: any) => {
+      //update ticket by adding other lines to description 
+        const selectQuery = 'SELECT description,historyOfStatus FROM ticket WHERE id = ?';
+        connection.query(selectQuery, [ticketId], (err: any, results: any) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+              const description = results[0].description;
+              const contentUpdate = req.body.contentUpdate;
+
+        // updating ticket
+         const newDescription = description +'\nCOMMENT_'+fromWho+'('+formattedDate+') : \n'+contentUpdate+'\n\\\\\\\\\\\\\\\\\\\\\endComment///////////////\n';
+ 
+        const updateQuery = 'UPDATE ticket SET  description = ? WHERE id = ?';
+
+        connection.query(updateQuery, [ newDescription, ticketId], (err: any, results: any) => {
             if (err) {
                 console.error('Error executing query:', err);
                 res.status(500).json({ error: 'Internal server error' });
                 return;
             }
 
-            console.log("Ticket updated successfully By User with status == FROM_USER");
+            console.log("Ticket updated successfully by User");
             res.status(200).json(results);
         }
         );
-       
-    }else {
+        });
+
+
+    }
+    else if(fromWho == 'FROM_ADMIN' || fromWho == 'FROM_RESPONSIBLE')
+    {
         //fetch ticket that have ticket id 
-        const selectQuery = 'SELECT historyOfStatus FROM ticket WHERE id = ?';
+        const selectQuery = 'SELECT historyOfStatus, description FROM ticket WHERE id = ?';
         connection.query(selectQuery, [ticketId], (err: any, results: any) => {
             if (err) {
                 console.error('Error executing query:', err);
@@ -111,14 +133,40 @@ router.post('/', (req: any, res: any) => {
                 return;
             }
            const historyOfStatus = results[0].historyOfStatus;
+           const description = results[0].description;
+           const contentUpdate = req.body.contentUpdate;
 
         // updating ticket
+        // if the descripton did not chaged 
+        if(contentUpdate == 'NO_CHANGE' )
+        {
+            const status = req.body.status;
+            const newHistoryOfStatus = historyOfStatus +',\n( '+status+' ) : '+formattedDate;
+            const updateQuery = 'UPDATE ticket SET  status = ?, historyOfStatus = ? WHERE id = ?';
+            connection.query(updateQuery, [status, newHistoryOfStatus, ticketId], (err: any, results: any) => {
+                if (err) {
+                    console.error('Error executing query:', err);
+                    res.status(500).json({ error: 'Internal server error' });
+                    return;
+                }
 
-        const newHistoryOfStatus = historyOfStatus +',\n('+d+')';
-        const status = req.body.status;
+                console.log("Ticket updated successfully by Admin or responible ");
+
+                res.status(200).json(results);
+
+            }
+            );
+        }
+        else if (status != 0 ){
+            // if the descripton chaged
+        const newDescription = description +'\nCOMMENT_'+fromWho+'('+formattedDate+') : \n'+contentUpdate+'\n\\\\\\\\\\\\\\\\\\\\\endComment///////////////\n';
+        const status = req.body.status; 
+        const newHistoryOfStatus = historyOfStatus +',\n( '+status+' ) : '+formattedDate;
+
+                console.log('status : '+status);
                     //update the entire ticket 
-        const updateQuery = 'UPDATE ticket SET title = ?, user_id = ?, description = ?, category_id = ?, status = ?, historyOfStatus = ? WHERE id = ?';
-        connection.query(updateQuery, [title, userId, description, categoryId, status, newHistoryOfStatus, ticketId], (err: any, results: any) => {
+        const updateQuery = 'UPDATE ticket SET  description = ? , status = ?, historyOfStatus = ? WHERE id = ?';
+        connection.query(updateQuery, [newDescription, status, newHistoryOfStatus, ticketId], (err: any, results: any) => {
             if (err) {
                 console.error('Error executing query:', err);
                 res.status(500).json({ error: 'Internal server error' });
@@ -129,10 +177,35 @@ router.post('/', (req: any, res: any) => {
             res.status(200).json(results);
         }
         );
-        });
+             } else if (status == 0 || status == '0' || status == 'null' || status == null || status == 'undefined' || status == undefined || status == '') {
+                // if the descripton chaged
+            const newDescription = description +'\nCOMMENT_'+fromWho+'('+formattedDate+') : \n'+contentUpdate+'\n\\\\\\\\\\\\\\\\\\\\\endComment///////////////\n';
+
+
+                        //update the entire ticket  
+            const updateQuery = 'UPDATE ticket SET  description = ?  WHERE id = ?';
+            connection.query(updateQuery, [newDescription, ticketId], (err: any, results: any) => {
+                if (err) {
+                    console.error('Error executing query:', err);
+                    res.status(500).json({ error: 'Internal server error' });
+                    return;
+                }
+        
+                console.log("Ticket updated successfully by Admin or responible ");
+                res.status(200).json(results);
+            }
+            );
+
+                }else {
+                    console.log("Ticket not updated successfully by Admin or responible ");
+                }
+
     
-}
+        });
+    }
+    
 });
+
 
 router.get('/ticket/:id', (req: any, res: any) => {
 

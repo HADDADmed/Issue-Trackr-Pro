@@ -2,14 +2,14 @@
 
 
 
-// // const mysql = require('mysql2/promise');
+const mysql = require('mysql');
 
-// // const connectionConfig = {
-// //   host: '127.0.0.1', // Change this to your MySQL host
-// //   user: 'root',
-// //   password: '',
-// //   database: 'IssueTrackrPro'
-// // };
+const connectionConfig = {
+  host: '127.0.0.1', // Change this to your MySQL host
+  user: 'root',
+  password: '',
+  database: 'IssueTrackrPro'
+};
 
 
 // async function insertCategories() {
@@ -21,14 +21,9 @@
 //     { name: '5C5ategory', description: 'Description for C5ategory 5' }
 //   ];
 
-//   const connection = await mysql.createConnection(connectionConfig);
+  const connection =  mysql.createConnection(connectionConfig);
 
-//   for (const category of categories) {
-//     await connection.execute(
-//       'INSERT INTO Category (name, description) VALUES (?, ?)',
-//       [category.name, category.description]
-//     );
-//   }
+ 
 
 //   console.log('Categories inserted successfully');
 
@@ -152,31 +147,65 @@
 //     `);
   
 //     // Create the Ticket table last
-//     await connection.query(`
-//       CREATE TABLE IF NOT EXISTS Ticket (
-//         id INT PRIMARY KEY AUTO_INCREMENT,
-//         title VARCHAR(255) NOT NULL,
-//         description TEXT,
-//         status VARCHAR(50) NOT NULL,
-//         category_id INT,
-//         user_id INT,
-//         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-//         historyOfStatus TEXT,
-//         FOREIGN KEY (category_id) REFERENCES Category(id),
-//         FOREIGN KEY (user_id) REFERENCES bUser(id)
-//       )
+   //  await connection.query(`
+   //    CREATE TABLE IF NOT EXISTS Ticket (
+   //      id INT PRIMARY KEY AUTO_INCREMENT,
+   //      title VARCHAR(255) NOT NULL,
+   //      description TEXT,
+   //      status VARCHAR(50) NOT NULL,
+   //      category_id INT,
+   //      user_id INT,
+   //      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   //      historyOfStatus TEXT,
+   //      FOREIGN KEY (category_id) REFERENCES Category(id),
+   //      FOREIGN KEY (user_id) REFERENCES bUser(id)
+   //    )
 //     `);
   
 //     await connection.end();
 //   }
 
+// Function to create the StatusHistory table
+function createCommentTable() {
+   const createTableQuery = `
+   ALTER TABLE Ticket
+         ADD currentStatusDate TIMESTAMP;
+   CREATE TABLE IF NOT EXISTS Status (
+         id INT PRIMARY KEY AUTO_INCREMENT,
+            status VARCHAR(50) NOT NULL
+          );
+   CREATE TABLE IF NOT EXISTS TicketStatusHistory  (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            ticket_id INT,
+            status_id INT,
+            changedByResponsible_id INT,
+            createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (ticket_id) REFERENCES Ticket(id),
+            FOREIGN KEY (status_id) REFERENCES Status(id)
+            FOREIGN KEY (changedByResponsible_id) REFERENCES User(id)
+          );
 
-
-async function main() {
-   const test1 = '\help';
-   console.log(test1);
-   const test2 = '\\help';
-   console.log(test2);
-}
-
-main();
+  
+   `;
+ 
+   connection.query(createTableQuery, (error, results, fields) => {
+     if (error) {
+       console.error('Error creating Notification table:', error);
+     } else {
+       console.log('Notification table created successfully');
+     }
+   });
+ }
+ async function main() {
+   try {
+     await createCommentTable();
+     console.log('Notification table created successfully');
+   } catch (error) {
+     console.error('Error creating Notification table:', error);
+   } finally {
+     connection.end(); // Close the database connection
+   }
+ }
+ 
+ // Execute the main function
+ main();

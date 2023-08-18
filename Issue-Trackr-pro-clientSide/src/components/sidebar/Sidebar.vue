@@ -33,8 +33,8 @@ import { collapsed, toggleSidebar, sidebarWidth } from './state'
     
     <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/" icon="fas fa-users">Liste Of Users </SidebarLink>
   <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/homeadminresponsibles" icon="fas fa-home">List of Rspsibles</SidebarLink>
-
   <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketlist" icon="fas fa-columns">List Of All Issues</SidebarLink>
+  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/categoryadd" icon="fas fa-columns">Add  category</SidebarLink>
 
         </div>
         <div v-if="whosAuthenticated == 'RESPONSIBLE'">

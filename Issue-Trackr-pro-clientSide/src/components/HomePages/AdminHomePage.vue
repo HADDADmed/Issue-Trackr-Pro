@@ -4,14 +4,57 @@ import { collapsed, toggleSidebar, sidebarWidth } from '@/components/sidebar/sta
 import  UserNavBar from '../NavBars/UserNavbar.vue'
 import { sidebarWidthNum } from '../sidebar/state';
 
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+// using the toasts
+import { createToaster } from "@meforma/vue-toaster";
+
+const toaster = createToaster({ /* options */ });
+
 function sidebarWidthNumf() {
   return `${sidebarWidthNum.value +40}px`;
 }
 
 // fetching users from the database
 import axios from 'axios';
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 const users = ref([]);
+let newRole = '';
+
+// changeRole function
+function changeRole(userId, oldRole) {
+  console.log("changeRole");
+  console.log("userId: " + userId);
+    if (oldRole == 'USER' || oldRole == 'user') {
+      newRole = 'RESPONSIBLE';
+    } else if (oldRole == 'RESPONSIBLE' || oldRole == 'responsible') {
+      newRole = 'USER';
+    }
+  console.log("newRole: " + newRole);
+  axios.put('http://localhost:8000/api/users/change-user-role',{
+    id: userId,
+    role: newRole
+  })
+  .then(function (response) {
+    console.log(response);
+    console.log("Role changed succefuly");
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  toaster.show(`<div><i class="fa-solid fa-circle-check"></i> User Role Changed to Responsible Successfuly !</div>`, {
+                        position: "top",
+                        duration: 5000,
+                        type: "success",
+
+                      });
+
+router.push('/homeadminresponsibles');
+
+}
+
+
 axios.get('http://localhost:8000/api/users/role/USER')
   .then(response => {
     users.value = response.data;
@@ -36,6 +79,34 @@ function displayUsers() {
   whatShouldIDisplay.value = 'USERS'
 }
 
+
+//function to chage user Role to responsible
+
+
+// Count number of tickets of user /count/:userId
+async function countTicketsbyUser(userId) {
+  try {
+    const response = await axios.get(`http://localhost:8000/api/users/count/${userId}`);
+    console.log(response.data[0]['COUNT(*)']);
+    return response.data[0]['COUNT(*)'];
+  } catch (error) {
+    console.error(error);
+    return 'N/A'; // Provide a default value in case of error
+  }
+}
+
+
+const userTicketCounts = ref({});
+
+// Fetch data on component mount
+onMounted(async () => {
+  console.log('Number of tickets:', await countTicketsbyUser(7));
+  
+  // Fetch ticket counts for all users
+  const ticketCountsPromises = users.value.map(user => countTicketsbyUser(user.id));
+  const ticketCounts = await Promise.all(ticketCountsPromises);
+  userTicketCounts.value = Object.fromEntries(users.value.map((user, index) => [user.id, ticketCounts[index]]));
+});
 </script>
 
 <template>
@@ -49,7 +120,7 @@ function displayUsers() {
 <div style="margin: 40px 40px 40px 0px; " :style="{ 'margin-left': sidebarWidthNumf() }" >
 
                         <h1 style="font-size: 35px; " >List  Of All Users</h1>
-                            <table class="table">
+                            <table class="table" style="border: 10px;" >
                         <thead>
                             <tr>
                             <th scope="col">#</th>
@@ -70,12 +141,16 @@ function displayUsers() {
                                 <td>{{ user.fullName }}</td>
                                 <td>{{ user.email  }}</td>
                                 <td>{{user.role}}</td>
-                                <td>50</td>
                                 <td>
-                                    <a href="#" class="btn btn-sm bg-success" > <i class="fa-solid fa-clock-rotate-left"> </i></a>
+                                  <router-link :to="'/ticketlist/' + user.id" class="ticketscount">
+                                    {{ userTicketCounts[user.id] }}
+                                  </router-link>
+                                </td>                               
+                                 <td>
+                                    <a @click="changeRole(user.id,user.role)" class="btn btn-sm bg-success hoverC" > <i class="fa-solid fa-clock-rotate-left"> </i></a>
                                     </td>
                                     <td>
-                                    <a href="#" class="btn btn-sm bg-danger" > <i class="fa-regular fa-trash-can"></i></a>
+                                    <a href="#" class="btn btn-sm bg-danger hoverC" > <i class="fa-regular fa-trash-can"></i></a>
                                     </td>
                                 
                                 </tr>
@@ -87,7 +162,8 @@ function displayUsers() {
 
     
     </div>
-      
+            
+           
  
 </template>
 
@@ -111,5 +187,28 @@ function displayUsers() {
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+.ticketscount {
+  text-decoration: none;
+  font-weight: bold;
+  margin-top: 0px;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 20px;
+  opacity: 0.5; /* Adjust the opacity value */
+  transition: opacity 0.2s; /* Add a smooth transition effect */
+  background-color: blue; /* Orange with transparency */
+  color: white;
+}
+.ticketscount:hover {
+  opacity: 1;
+  transform: scale(1.2); /* Slightly bigger on hover */
+  opacity: 1; /* Adjust the opacity value */
+
+}
+.hoverC:hover {
+  opacity: 1;
+  transform: scale(1.2); /* Slightly bigger on hover */
+
 }
 </style>

@@ -3,6 +3,9 @@ import anime from 'animejs'; // Make sure you have animejs installed
 import axios from 'axios';
 import { ref } from 'vue';
 import router from '../router';
+import { createToaster } from "@meforma/vue-toaster";
+
+const toaster = createToaster({ /* options */ });
 export default {
   data() {
     return {
@@ -89,6 +92,12 @@ export default {
           localStorage.setItem('whosAuthenticated', JSON.stringify(response.data.user.role));
           const whosAuthenticated = localStorage.getItem('whosAuthenticated');
           console.log("whosAuthenticated From Login: " + whosAuthenticated); 
+          toaster.show(`<div><i class="fa-solid fa-circle-check"></i> Welcome  ${response.data.user.fullName} to IssuesTrackerPro !</div>`, {
+              position: "top",
+              duration: 5000,
+              type: "success",
+
+            });
              router.push('/home');
           if (response.status === 200) {
           this.errorMessage = '';
@@ -96,8 +105,20 @@ export default {
           }
           } catch (error) {
           if (error.response) {
+            toaster.show(`<div><i class="fa-solid fa-triangle-exclamation"></i> Invalide Credentials  !</div>`, {
+              position: "top",
+              duration: 5000,
+              type: "error",
+
+            });
           this.errorMessage = error.response.data.error;
           } else {
+            toaster.show(`<div><i class="fa-solid fa-triangle-exclamation"></i> Invalide Credentials  !</div>`, {
+              position: "top",
+              duration: 5000,
+              type: "error",
+
+            });
           this.errorMessage = 'An error occurred';
           }
           }

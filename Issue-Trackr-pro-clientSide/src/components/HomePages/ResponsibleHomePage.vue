@@ -1,46 +1,52 @@
 <script setup>
 import { sidebarWidthNum } from '../sidebar/state';
 import Sidebar from '@/components/sidebar/Sidebar.vue';
+import axios from 'axios';
+import { ref, onMounted, defineAsyncComponent } from 'vue';
 
-//count number of issues in the database
+// Count number of issues in the database
 
-
-//counting elements in issues array
+// Counting elements in issues array
 
 const whosAuthenticated = ref(localStorage.getItem('token') ? JSON.parse(localStorage.getItem('user')).role : 'NOT_AUTHENTICATED');
 const issues = ref([]); // Define 'issues' outside of conditionals
-
-  // if (whosAuthenticated.value === 'ADMIN' || whosAuthenticated.value === 'RESPONSIBLE') {
-  //     const fetchIssues = async () => {
-  //         const response = await fetch('http://localhost:8000/api/tickets/');
-  //         issues.value = await response.json();
-  //     };
-  //     onMounted(fetchIssues);
-  // } else if (whosAuthenticated.value === 'USER') {
-  //     const fetchIssues = async () => {
-  //         const response = await fetch('http://localhost:8000/api/tickets/'+JSON.parse(localStorage.getItem('user')).id);
-  //         issues.value = await response.json();
-  //     };
-  //     onMounted(fetchIssues);
-  // } else {
-  //     console.log("Not Authenticated");
-  // }
-
-
-
-function sidebarWidthNumf() {
-  return `${sidebarWidthNum.value +40}px`;
-}
-// fetching users from the database
-import axios from 'axios';
-import { ref } from 'vue';
 const users = ref([]);
+
+// Fetching users from the database
 axios.get('http://localhost:8000/api/users/role/USER')
   .then(response => {
     users.value = response.data;
   })
   .catch(error => console.log(error));
+// Function to calculate sidebar width
+function sidebarWidthNumf() {
+  return `${sidebarWidthNum.value + 40}px`;
+}
 
+// Count number of tickets of user /count/:userId
+async function countTicketsbyUser(userId) {
+  try {
+    const response = await axios.get(`http://localhost:8000/api/users/count/${userId}`);
+    console.log(response.data[0]['COUNT(*)']);
+    return response.data[0]['COUNT(*)'];
+  } catch (error) {
+    console.error(error);
+    return 'N/A'; // Provide a default value in case of error
+  }
+}
+
+
+const userTicketCounts = ref({});
+
+// Fetch data on component mount
+onMounted(async () => {
+  console.log('Number of tickets:', await countTicketsbyUser(7));
+  
+  // Fetch ticket counts for all users
+  const ticketCountsPromises = users.value.map(user => countTicketsbyUser(user.id));
+  const ticketCounts = await Promise.all(ticketCountsPromises);
+  userTicketCounts.value = Object.fromEntries(users.value.map((user, index) => [user.id, ticketCounts[index]]));
+});
 </script>
 
 <template>
@@ -85,7 +91,12 @@ axios.get('http://localhost:8000/api/users/role/USER')
         <td>
           <a href="#" class="btn btn-sm bg-success" > <i class="fa-solid fa-clock-rotate-left"> </i></a>
            </td>
-        <td>50</td> 
+           <td>
+            <router-link :to="'/ticketlist/' + user.id" class="ticketscount">
+              {{ userTicketCounts[user.id] }}
+            </router-link>
+          </td>
+
         </tr>
 
 </tbody>
@@ -98,4 +109,25 @@ axios.get('http://localhost:8000/api/users/role/USER')
 </template>
 
 <style scoped>
+
+.ticketscount {
+  text-decoration: none;
+  font-weight: bold;
+  margin-top: 0px;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 20px;
+  opacity: 0.5; /* Adjust the opacity value */
+  transition: opacity 0.2s; /* Add a smooth transition effect */
+  background-color: blue; /* Orange with transparency */
+  color: white;
+}
+
+
+.ticketscount:hover {
+  opacity: 1;
+  transform: scale(1.2); /* Slightly bigger on hover */
+  opacity: 1; /* Adjust the opacity value */
+
+}
 </style>

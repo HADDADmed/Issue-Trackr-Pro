@@ -9,7 +9,7 @@ import AdminHomeresp from '../views/AdminHomeresp.vue'
 import TickestsList from '../views/TicketsListVue.vue'
 import TicketsAdd from '../views/TicketsAddVue.vue'
 import TicketDetaills from '../views/TicketDetaillsVue.vue'
-
+import CategoryAdd from '../views/CategoryAddVue.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,6 +49,10 @@ const router = createRouter({
       name: 'ticketlist',
       component: TickestsList
     },{
+      path: '/ticketlist/:userId',
+      name: 'ticketlistuderid',
+      component: TickestsList
+    },{
       path: '/ticketsadd/:id',
       name: 'ticketsadd',
       component: TicketsAdd
@@ -56,6 +60,10 @@ const router = createRouter({
       path: '/ticketdetaills/:id',
       name: 'TicketDetaills',
       component: TicketDetaills
+    },{
+      path: '/categoryadd',
+      name: 'categoryadd',
+      component: CategoryAdd
     }
   ]
 })

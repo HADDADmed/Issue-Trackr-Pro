@@ -3,9 +3,14 @@ import Sidebar from '@/components/sidebar/Sidebar.vue';
 import { collapsed, toggleSidebar, sidebarWidth } from '@/components/sidebar/state.js';
 import { sidebarWidthNum } from '@/components/sidebar/state';
 import MainNavBar from '@/components/MainNavBar.vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 function sidebarWidthNumf() {
   return `${sidebarWidthNum.value +40}px`;
 }
+import { createToaster } from "@meforma/vue-toaster";
+
+const toaster = createToaster({ /* options */ });
 
 // fetching users from the database
 import axios from 'axios';
@@ -27,7 +32,42 @@ axios.get('http://localhost:8000/api/users/role/RESPONSIBLE')
   .catch(error => console.log(error));
 
 const props = defineProps(['whatShouldIDisplay'])
+
+
 const ADMIN =   'ADMIN';
+let newRole = '';
+
+// changeRole function
+function changeRole(userId, oldRole) {
+  console.log("changeRole");
+  console.log("userId: " + userId);
+    if (oldRole == 'USER' || oldRole == 'user') {
+      newRole = 'RESPONSIBLE';
+    } else if (oldRole == 'RESPONSIBLE' || oldRole == 'responsible') {
+      newRole = 'USER';
+    }
+  console.log("newRole: " + newRole);
+  axios.put('http://localhost:8000/api/users/change-user-role',{
+    id: userId,
+    role: newRole
+  })
+  .then(function (response) {
+    console.log(response);
+    console.log("Role changed succefuly");
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  
+  toaster.show(`<div><i class="fa-solid fa-circle-check"></i> Role Responsible Changed to User Successfuly !</div>`, {
+                        position: "top",
+                        duration: 5000,
+                        type: "success",
+
+                      });
+router.push('/');
+
+}
 
 </script>
 <template> 
@@ -61,10 +101,10 @@ const ADMIN =   'ADMIN';
                                 <td>{{responsible.role}}</td>
                                 <td>50</td>
                                 <td>
-                                    <a href="#" class="btn btn-sm bg-success" > <i class="fa-solid fa-clock-rotate-left"> </i></a>
+                                    <a @click="changeRole(responsible.id,responsible.role)" class="btn btn-sm bg-success hoverC" > <i class="fa-solid fa-clock-rotate-left"> </i></a>
                                     </td>
                                     <td>
-                                    <a href="#" class="btn btn-sm bg-danger" > <i class="fa-regular fa-trash-can"></i></a>
+                                    <a href="#" class="btn btn-sm bg-danger hoverC" > <i class="fa-regular fa-trash-can"></i></a>
                                     </td>
                                 </tr>
                         
@@ -96,5 +136,10 @@ const ADMIN =   'ADMIN';
 #nav a.router-link-exact-active {
   color: #42b983;
 }
+.hoverC:hover {
+  opacity: 1;
+  transform: scale(1.2); /* Slightly bigger on hover */
+
+} 
 </style>
 
