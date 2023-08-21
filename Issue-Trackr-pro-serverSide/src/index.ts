@@ -3,6 +3,8 @@ import bodyParser from "body-parser"
 import { ticketsRouter } from "./routers/tickets.router";
 import { usersRouter } from "./routers/users.router";
 import { categoriesRouter } from "./routers/categories.router";
+import { commentsRouter } from "./routers/comments.router";
+import { statusRouter } from "./routers/ticketStatus.router";
 const connection = require('./DataBaseManager/dbConnection'); // Adjust the path as needed
 const app: Application = express();
 
@@ -35,6 +37,9 @@ connection.connect(function (err: any) {
 app.use('/api/tickets', ticketsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/categories', categoriesRouter);
+app.use('/api/comments', commentsRouter);
+app.use('/api/status', statusRouter);
+
 
 
 

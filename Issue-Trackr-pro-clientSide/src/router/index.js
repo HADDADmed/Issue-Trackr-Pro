@@ -9,6 +9,7 @@ import AdminHomeresp from '../views/AdminHomeresp.vue'
 import TickestsList from '../views/TicketsListVue.vue'
 import TicketsAdd from '../views/TicketsAddVue.vue'
 import TicketDetaills from '../views/TicketDetaillsVue.vue'
+import TicketHitory from '../views/TicketHitoryVue.vue'
 import CategoryAdd from '../views/CategoryAddVue.vue'
 
 const router = createRouter({
@@ -64,6 +65,10 @@ const router = createRouter({
       path: '/categoryadd',
       name: 'categoryadd',
       component: CategoryAdd
+    },{
+      path: '/tickethistory/:id',
+      name: 'TicketHistory',
+      component: TicketHitory
     }
   ]
 })

@@ -216,7 +216,7 @@ const formatDate = (value) => {
   return formattedDate;
 };
 function toTicketHisytory(){
-  router.push({ name: 'TicketHistory', params: { id: ticket_id } });
+  router.push({ name: 'TicketDetaills', params: { id: ticket_id } });
 }
 </script>
 
@@ -263,8 +263,8 @@ function toTicketHisytory(){
                           <label class="input-group-text" for="inputGroupSelect02">Category</label>
                         </div>
                       </div>
-                   
-                        <div @click="toTicketHisytory()" class="hoverC" style="margin-left: -200px; margin-right:50px; margin-top:-10px; cursor: pointer; display: flex ; height: 10px;" >   <a @click="toTicketHisytory()" > <i style="font-size:45px;" class="fa fa-history" aria-hidden="true"></i> </a> </div>
+                      
+                      <div @click="toTicketHisytory()" class="hoverC" style="margin-left: -200px; margin-right:50px; margin-top:-10px; cursor: pointer; display: flex ; height: 10px;" >   <a @click="toTicketHisytory()" > <i style="font-size:45px;" class="fa-solid fa-comment" aria-hidden="true"></i> </a> </div>
                     </div>   
 
                <div v-if="(whosAuthenticated == 'ADMIN' || whosAuthenticated == 'RESPONSIBLE')" style="margin-right: 150px;" ><!-- //status input  -->
@@ -382,125 +382,95 @@ function toTicketHisytory(){
                                         </div>
                       </div>
 
-                <div class="comments">
+                <!-- start hystory of status -->
 
-                  <div class="container mt-5">
-
-                              <div class="row  d-flex justify-content-center">
-
-                                  <div class="col-md-8">
-
-                                  
-
-                                      
-                                    <div v-for="comment in comments" class="card p-3">
-
-                                                <div class="d-flex justify-content-between align-items-center">
-
-                                                <div class="user d-flex flex-row align-items-center">
-
-                                                <img src="./accountLogo.png" width="30" style="margin-right: 15px;" class="user-img rounded-circle mr-2">
-                                                <span><small class="font-weight-bold text-primary" style="margin-right: 15px;">{{comment.user_id}}</small></span>
-                                                  
-                                                </div>
-
-                                                <small>{{formatDate(comment.commentedAt) }}</small>
-
-                                                </div>
-                                                <div class="comment-content " style="margin:20px;">
-                                                {{ comment.commentContent }}
-                                                </div>
-
-
-                                                <div class="action mt-2 align-items-center">
-
-                                                <!-- <div class="reply px-4">
-                                                  <small >Remove</small>
-                                                  <button type="button" style="width: 40px; height: 40px;" @click="cancel()" class="btn btn-danger btn-sm btn-block rounded-circle hoverC m-5 ">C</button>
-                                                  <small>Reply</small>
-                                                  <button type="button" style="width: 40px; height: 40px;" @click="saveTicket()" class="btn btn-success btn-sm btn-block rounded-circle hoverC">S</button>
-                                                  
-
-                                                  
-                                                </div> -->
-                                                <div class="d-flex justify-content-end">
-                                                  
-
-                                                </div>
+                <div v-if="loadingSpinner" style="position: relative; top:200px;"  class="d-flex justify-content-center ">
+                        <div style="position: relative; top: -10px;">
+                          <LoadingSpiner  :isLoadingSpinerActive="loadingSpinner" > </LoadingSpiner>
+                       </div>
+                      </div>
+        <!-- ADD NEW ISSUE  -->
+        <div v-else>
+          <h1 style="margin-bottom: 10px;" >{{title}} </h1>
+<!-- 
+        <table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">user Name</th>
+      <th scope="col">Title</th>
+      <th colspan="3" scope="col">Content</th>
+      <th scope="col">Status</th>
+      <th scope="col">created AT</th>
+      
+    </tr>
+  </thead>
+  <tbody>
+  
+    <tr>
+      <th scope="row">Harry potter</th>
+      <td>@twitter</td>
+      <td colspan="3">Larry the Bird</td>
+      <td>pending</td>
+      <td>18/20/2015</td>
+    </tr>
+  </tbody>
+</table> -->
 
 
-                                                  
-                                                </div>
+                <table class="table">
+                <thead class="thead-light">
+                                               
+                                    <tr style="border: 10px;"  >
+                                    <th scope="col">NavTo</th>
+                                    <th scope="col">#ticket_id</th>
+                                    <th scope="col">#user_Id</th>
+                                    <th scope="col">#Category_Id</th>
+                                    <th scope="col">Title</th>
+                                    <th colspan="3" scope="col">Content</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">createdAt</th>
+                                    <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                
+                                    <tr v-for="issue in issues" style="border: 10px;">
+                                       <td scope="row">
+                                           <router-link :to="{ name: 'TicketDetaills', params: { id: issue.id } }" class="btn btn-success hoverC">
+                                            <i class="fa-solid fa-arrow-right"></i>
+                                          </router-link>
 
-
-
-                                                </div>
-
-                                      <div class="card p-3">
-
-                                          <div class="d-flex justify-content-between align-items-center">
-
-                                          <div class="user d-flex flex-row align-items-center">
-
-                                          <img src="./accountLogo.png" width="30" style="margin-right: 15px;" class="user-img rounded-circle mr-2">
-                                          <span><small class="font-weight-bold text-primary" style="margin-right: 15px;">YOU</small> </span>
-                                            
+                                        </td>
+                                        <th scope="row">{{ issue.id }}</th>
+                                        <th scope="row">{{ issue.user_id }}</th>
+                                        <td>{{issue.category_id}}</td>
+                                        <td>{{issue.title}}</td>
+                                        <td colspan="3">
+                                          <div class="issue-description">
+                                            <div class="short-description">{{ getShortDescription(issue.description) }}</div>
                                           </div>
+                                        </td>                                       
+                                       <td><span  class="status" :class="getStatusClass(issue.status)" >{{ issue.status }}</span></td>
+                                        <td>{{formatDate(issue.createdAt ) }}</td>
+                                        <td scope="row">
+                                            <div   class="d-flex justify-content-between">
+                                              <a v-if="whosAuthenticated == 'ADMIN'||whosAuthenticated == 'RESPONSIBLE'"  style="width: 30px; height: 30px;" class="btn btn-secondary rounded-circle" href="#"> 
+                                                <div style="font-size: 18px; display: flex; justify-content: center;">
+                                                    <i class="fa-regular fa-pen-to-square"></i>
+                                                </div>
+                                            </a>
+                                            <a style="width: 30px; height: 30px;" @click="deleteTicket(issue.id)" class="btn btn-danger rounded-circle hoverC" href="#"> 
+                                                <div style="font-size: 18px; display: flex; justify-content: center;">
+                                                  <i class="fa-solid fa-trash-can"></i>
 
-                                          <small>{{ currentTimestamp  }}</small>
-
-                                          </div>
-                                          <div class="comment-content " style="margin:20px;">
-                                            <div style="border: 10px; " class="card">
-                                          <textarea v-model="ticket.contentUpdate" class="" id="Content" rows="5" aria-label="With textarea"></textarea>
-                                         
-                                          </div>
-                                          </div>
-
-
-                                          <div class="action mt-2 align-items-center">
-
-                                          <!-- <div class="reply px-4">
-                                            <small >Remove</small>
-                                            <button type="button" style="width: 40px; height: 40px;" @click="cancel()" class="btn btn-danger btn-sm btn-block rounded-circle hoverC m-5 ">C</button>
-                                            <small>Reply</small>
-                                            <button type="button" style="width: 40px; height: 40px;" @click="saveTicket()" class="btn btn-success btn-sm btn-block rounded-circle hoverC">S</button>
-                                            
-
-                                            
-                                          </div> -->
-                                          <div class="d-flex justify-content-end">
-                                            <div>
-                                              <button type="button" style="width: 100px; height: 40px; margin-right: 10px;" @click="saveTicket()" class="btn btn-success btn-sm btn-block rounded-pill  hoverC ">Replay</button>
-                                              <button type="button" style="width: 100px; height: 40px; margin-right: 50px;" @click="cancel()" class="btn btn-danger btn-sm btn-block rounded-pill hoverC  ">Cancel</button>
-
+                                                </div>
+                                            </a>
                                             </div>
-
-                                          </div>
-
-
-                                            
-                                          </div>
-
-
-
-                                        </div>
-                                        
-
-
-
-                                      
-                                  </div>
-                                  
-                              </div>
-
-                              </div>
-
-
-
-
-                </div>
-
+                                        </td>
+                                    </tr>
+                                </tbody>
+                </table>
+        </div>
           </div>
       </div>
       </div>

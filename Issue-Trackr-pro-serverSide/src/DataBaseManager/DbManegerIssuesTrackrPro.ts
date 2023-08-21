@@ -196,9 +196,34 @@ function createCommentTable() {
      }
    });
  }
+
+
+
+ // CREAT TABLE Status (
+  function createStatusTable() {
+    const createTableQuery = `
+    ALTER TABLE TicketStatus
+    ADD changedByUser_id INT,
+    ADD FOREIGN KEY (changedByUser_id) REFERENCES User(id);
+
+ 
+    
+    `;
+      
+    connection.query(createTableQuery, (error, results, fields) => {
+      if (error) {
+        console.error('Error creating Notification table:', error);
+      } else {
+        console.log('Notification table created successfully');
+      }
+
+    });
+  }
+
+
  async function main() {
    try {
-     await createCommentTable();
+     await createStatusTable();
      console.log('Notification table created successfully');
    } catch (error) {
      console.error('Error creating Notification table:', error);

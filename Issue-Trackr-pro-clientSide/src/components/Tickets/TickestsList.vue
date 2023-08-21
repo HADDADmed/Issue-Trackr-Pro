@@ -162,6 +162,16 @@ function getStatusClass(status) {
     return 'status-default'; // Provide a default class if status doesn't match
   }
 }
+
+
+import LoadingSpiner from '../Partials/LoadingSpiner.vue';
+// creating a boolean to show the loading spinner
+const loadingSpinner = ref(true);
+// returning Loadingspinner to fals after 3 seconds
+setTimeout(() => {
+  loadingSpinner.value = false;
+}, 2400);
+
 </script>
 
 <template>
@@ -172,8 +182,14 @@ function getStatusClass(status) {
 
     <div style="margin: 40px 40px 40px 0px; " :style="{ 'margin-left': sidebarWidthNumf() }" >
 
+                      <div v-if="loadingSpinner" style="position: relative; top:200px;"  class="d-flex justify-content-center ">
+                        <div style="position: relative; top: -10px;">
+                          <LoadingSpiner  :isLoadingSpinerActive="loadingSpinner" > </LoadingSpiner>
+                       </div>
+                      </div>
         <!-- ADD NEW ISSUE  -->
-        <h1 style="margin-bottom: 10px;" >{{title}} </h1>
+        <div v-else>
+          <h1 style="margin-bottom: 10px;" >{{title}} </h1>
 <!-- 
         <table class="table table-bordered">
   <thead>
@@ -273,11 +289,126 @@ function getStatusClass(status) {
                 </div>
                         </div>
               </Modal>
+        </div>
 </div>
 </div>
 </template>
 
 <style scoped>
+
+.smiley {
+	width: 8em;
+	height: 8em;
+}
+.smiley__eye1,
+.smiley__eye2,
+.smiley__mouth1,
+.smiley__mouth2 {
+	animation: eye1 3s ease-in-out infinite;
+}
+.smiley__eye1,
+.smiley__eye2 {
+	transform-origin: 64px 64px;
+}
+.smiley__eye2 {
+	animation-name: eye2;
+}
+.smiley__mouth1 {
+	animation-name: mouth1;
+}
+.smiley__mouth2 {
+	animation-name: mouth2;
+	visibility: hidden;
+}
+
+/* Dark theme */
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: hsl(var(--hue),90%,10%);
+		--fg: hsl(var(--hue),90%,90%);
+	}
+}
+
+/* Animations */
+@keyframes eye1 {
+	from {
+		transform: rotate(-260deg) translate(0,-56px);
+	}
+	50%,
+	60% {
+		animation-timing-function: cubic-bezier(0.17,0,0.58,1);
+		transform: rotate(-40deg) translate(0,-56px) scale(1);
+	}
+	to {
+		transform: rotate(225deg) translate(0,-56px) scale(0.35);
+	}
+}
+@keyframes eye2 {
+	from {
+		transform: rotate(-260deg) translate(0,-56px);
+	}
+	50% {
+		transform: rotate(40deg) translate(0,-56px) rotate(-40deg) scale(1);
+	}
+	52.5% {
+		transform: rotate(40deg) translate(0,-56px) rotate(-40deg) scale(1,0);
+	}
+	55%,
+	70% {
+		animation-timing-function: cubic-bezier(0,0,0.28,1);
+		transform: rotate(40deg) translate(0,-56px) rotate(-40deg) scale(1);
+	}
+	to {
+		transform: rotate(150deg) translate(0,-56px) scale(0.4);
+	}
+}
+@keyframes eyeBlink {
+	from,
+	25%,
+	75%,
+	to {
+		transform: scaleY(1);
+	}
+	50% {
+		transform: scaleY(0);
+	}
+}
+@keyframes mouth1 {
+	from {
+		animation-timing-function: ease-in;
+		stroke-dasharray: 0 351.86;
+		stroke-dashoffset: 0;
+	}
+	25% {
+		animation-timing-function: ease-out;
+		stroke-dasharray: 175.93 351.86;
+		stroke-dashoffset: 0;
+	}
+	50% {
+		animation-timing-function: steps(1,start);
+		stroke-dasharray: 175.93 351.86;
+		stroke-dashoffset: -175.93;
+		visibility: visible;
+	}
+	75%,
+	to {
+		visibility: hidden;
+	}
+}
+@keyframes mouth2 {
+	from {
+		animation-timing-function: steps(1,end);
+		visibility: hidden;
+	}
+	50% {
+		animation-timing-function: ease-in-out;
+		visibility: visible;
+		stroke-dashoffset: 0;
+	}
+	to {
+		stroke-dashoffset: -351.86;
+	}
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

@@ -9,7 +9,8 @@ import { format } from 'date-fns'; // Import the format function from the 'date-
 router.get('/', (req: any, res: any) => {
     console.log("Get all tickets");
 
-    const selectQuery = 'SELECT * FROM ticket';
+    //creat a query to get all tickets ordred by status
+    const selectQuery = 'SELECT * FROM ticket ORDER BY status DESC';
 
     connection.query(selectQuery, (err: any, results: any) => {
         if (err) {
@@ -25,7 +26,7 @@ router.get('/', (req: any, res: any) => {
 router.get('/:userid', (req: any, res: any) => {
     console.log("Get tickets by user id");
 
-    const selectQuery = 'SELECT * FROM ticket WHERE user_id = ?';
+    const selectQuery = 'SELECT * FROM ticket WHERE user_id = ?  ORDER BY status DESC';
     const userId = req.params.userid;
 
     connection.query(selectQuery, [userId], (err: any, results: any) => {
@@ -89,39 +90,40 @@ router.post('/', (req: any, res: any) => {
         }
         );
 
-    }else if(status == 'FROM_USER' && fromWho == 'FROM_USER')
-    {
-      //update ticket by adding other lines to description 
-        const selectQuery = 'SELECT description,historyOfStatus FROM ticket WHERE id = ?';
-        connection.query(selectQuery, [ticketId], (err: any, results: any) => {
-            if (err) {
-                console.error('Error executing query:', err);
-                res.status(500).json({ error: 'Internal server error' });
-                return;
-            }
-              const description = results[0].description;
-              const contentUpdate = req.body.contentUpdate;
+   }
+   //   else if(status == 'FROM_USER' && fromWho == 'FROM_USER')
+    // {
+    //   //update ticket by adding other lines to description 
+    //     const selectQuery = 'SELECT description,historyOfStatus FROM ticket WHERE id = ?';
+    //     connection.query(selectQuery, [ticketId], (err: any, results: any) => {
+    //         if (err) {
+    //             console.error('Error executing query:', err);
+    //             res.status(500).json({ error: 'Internal server error' });
+    //             return;
+    //         }
+    //           const description = results[0].description;
+    //           const contentUpdate = req.body.contentUpdate;
 
-        // updating ticket
-         const newDescription = description +'\nCOMMENT_'+fromWho+'('+formattedDate+') : \n'+contentUpdate+'\n\\\\\\\\\\\\\\\\\\\\\endComment///////////////\n';
+    //     // updating ticket
+    //      const newDescription = description +'\nCOMMENT_'+fromWho+'('+formattedDate+') : \n'+contentUpdate+'\n\\\\\\\\\\\\\\\\\\\\\endComment///////////////\n';
  
-        const updateQuery = 'UPDATE ticket SET  description = ? WHERE id = ?';
+    //     const updateQuery = 'UPDATE ticket SET  description = ? WHERE id = ?';
 
-        connection.query(updateQuery, [ newDescription, ticketId], (err: any, results: any) => {
-            if (err) {
-                console.error('Error executing query:', err);
-                res.status(500).json({ error: 'Internal server error' });
-                return;
-            }
+    //     connection.query(updateQuery, [ newDescription, ticketId], (err: any, results: any) => {
+    //         if (err) {
+    //             console.error('Error executing query:', err);
+    //             res.status(500).json({ error: 'Internal server error' });
+    //             return;
+    //         }
 
-            console.log("Ticket updated successfully by User");
-            res.status(200).json(results);
-        }
-        );
-        });
+    //         console.log("Ticket updated successfully by User");
+    //         res.status(200).json(results);
+    //     }
+    //     );
+    //     });
 
 
-    }
+    // }
     else if(fromWho == 'FROM_ADMIN' || fromWho == 'FROM_RESPONSIBLE')
     {
         //fetch ticket that have ticket id 
@@ -176,27 +178,28 @@ router.post('/', (req: any, res: any) => {
             console.log("Ticket updated successfully by Admin or responible ");
             res.status(200).json(results);
         }
-        );
-             } else if (status == 0 || status == '0' || status == 'null' || status == null || status == 'undefined' || status == undefined || status == '') {
-                // if the descripton chaged
-            const newDescription = description +'\nCOMMENT_'+fromWho+'('+formattedDate+') : \n'+contentUpdate+'\n\\\\\\\\\\\\\\\\\\\\\endComment///////////////\n';
+        );}
+            //   else if (status == 0 || status == '0' || status == 'null' || status == null || status == 'undefined' || status == undefined || status == '') {
+            //     // if the descripton chaged
+            // const newDescription = description +'\nCOMMENT_'+fromWho+'('+formattedDate+') : \n'+contentUpdate+'\n\\\\\\\\\\\\\\\\\\\\\endComment///////////////\n';
 
 
-                        //update the entire ticket  
-            const updateQuery = 'UPDATE ticket SET  description = ?  WHERE id = ?';
-            connection.query(updateQuery, [newDescription, ticketId], (err: any, results: any) => {
-                if (err) {
-                    console.error('Error executing query:', err);
-                    res.status(500).json({ error: 'Internal server error' });
-                    return;
-                }
+            //             //update the entire ticket  
+            // const updateQuery = 'UPDATE ticket SET  description = ?  WHERE id = ?';
+            // connection.query(updateQuery, [newDescription, ticketId], (err: any, results: any) => {
+            //     if (err) {
+            //         console.error('Error executing query:', err);
+            //         res.status(500).json({ error: 'Internal server error' });
+            //         return;
+            //     }
         
-                console.log("Ticket updated successfully by Admin or responible ");
-                res.status(200).json(results);
-            }
-            );
+            //     console.log("Ticket updated successfully by Admin or responible ");
+            //     res.status(200).json(results);
+            // }
+            // );
 
-                }else {
+            //     }
+                else {
                     console.log("Ticket not updated successfully by Admin or responible ");
                 }
 
