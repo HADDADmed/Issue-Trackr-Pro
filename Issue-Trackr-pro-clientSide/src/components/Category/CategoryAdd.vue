@@ -5,6 +5,9 @@ import { ref, onMounted } from 'vue';
 import { sidebarWidthNum } from '../sidebar/state';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { createToaster } from "@meforma/vue-toaster";
+
+const toaster = createToaster({ /* options */ });
 
 const user = ref(JSON.parse(localStorage.getItem('user')));
 const categories = ref([]);
@@ -25,8 +28,14 @@ function saveCategory() {
   axios.post('http://localhost:8000/api/categories', newCategory.value)
     .then(function (response) {
       console.log(response);
-      alert("Category Added");
-      router.push({ name: '/' }); // Assuming you have a route named 'categorylist'
+      toaster.show(`<div><i class="fa-solid fa-circle-check"></i> Category saved successfuly !</div>`, {
+                        position: "top",
+                        duration: 5000,
+                        type: "success",
+
+                      });
+          
+    router.push({ name: '/' }); // Assuming you have a route named 'categorylist'
     })
     .catch(function (error) {
       console.log(error);

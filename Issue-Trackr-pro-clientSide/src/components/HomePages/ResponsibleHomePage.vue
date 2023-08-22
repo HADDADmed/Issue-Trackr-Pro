@@ -68,8 +68,7 @@ onMounted(async () => {
     <th scope="col">Full Name</th>
     <th scope="col">Email</th>
     <th scope="col">User Role</th>
-    <th scope="col">ChRole</th>
-    <th scope="col">Issues</th>
+    <th class="d-flex justify-content-center" scope="col">Issues</th>
     
     </tr>
 
@@ -88,10 +87,8 @@ onMounted(async () => {
         <td>{{ user.fullName }}</td>
         <td>{{ user.email  }}</td>
         <td>{{user.role}}</td>
-        <td>
-          <a href="#" class="btn btn-sm bg-success" > <i class="fa-solid fa-clock-rotate-left"> </i></a>
-           </td>
-           <td>
+       
+           <td class="d-flex justify-content-center"  >
             <router-link :to="'/ticketlist/' + user.id" class="ticketscount">
               {{ userTicketCounts[user.id] }}
             </router-link>

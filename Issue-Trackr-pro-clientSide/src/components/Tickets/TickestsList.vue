@@ -248,7 +248,7 @@ setTimeout(() => {
                                             <div class="short-description">{{ getShortDescription(issue.description) }}</div>
                                           </div>
                                         </td>                                       
-                                       <td><span  class="status" :class="getStatusClass(issue.status)" >{{ issue.status }}</span></td>
+                                       <td><span  class="status d-flex justify-content-center" :class="getStatusClass(issue.status)" >{{ issue.status }}</span></td>
                                         <td>{{formatDate(issue.createdAt ) }}</td>
                                         <td scope="row">
                                             <div   class="d-flex justify-content-between">

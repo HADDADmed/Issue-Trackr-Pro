@@ -32,7 +32,7 @@ let  contentUpdate = ref('');
 //fetching ticket from the databess
 
 const ticket_id = route.params.id;
-let statusT = '';
+const commentContent = ref('');
 const ticket = ref({
     id: ticket_id,
     title: '',
@@ -48,33 +48,87 @@ const ticket = ref({
 var statusIndex = ref(0);
 var actualStatus = ref('');
 
+function getStatusName(statusId) {
+  const status = statuses3.value.find(item => item.id === statusId);
+  return status ? status.status : 'Unknown';
+}
+const statuses3 = ref([
+    { id: 1, status: 'OPEN' },
+    { id: 2, status: 'PENDING' },
+    { id: 3, status: 'CLOSED' },
+    ]);
+// Toggle the full description visibility
+function getStatusClass(status) {
+  console.log("getStatusClass   the actual class is :  " + status);
+  if (status === 'OPEN' || status === 'open'  || status === 'Open') {
+    console.log("getStatusClass  OPEN veryfied" );
+    return 'status-open';
+  } else if (status === 'PENDING' || status === 'pending' || status === 'Pending') {
+    console.log("getStatusClass  PENDING veryfied" );
+    return 'status-pending';
+  } else if (status === 'CLOSED'  || status === 'closed'  || status === 'Closed') {
+    console.log("getStatusClass  CLOSED veryfied" );
+    return 'status-closed';
+  } else {
+    console.log("getStatusClass  default veryfied" );
+    return 'status-default'; // Provide a default class if status doesn't match
+  }
+}
+
+async function fetchUpdatedStatus() {
+  try {
+    const response = await axios.get(`http://localhost:8000/api/tickets/ticket/${ticket_id}`);
+    ticketDb.value = {
+      id: response.data.id,
+      title: response.data.title,
+      content : response.data.description,
+      category_id: response.data.category_id,
+      status: getStatusName(response.data.status_id),
+      user_id: response.data.user_id,
+    }
+  } catch (error) {
+    console.error('Error fetching updated status:', error);
+  }
+}
 onMounted(async () => {
   try {
     const categoriesResponse = await axios.get('http://localhost:8000/api/categories');
     const ticketResponse = await axios.get(`http://localhost:8000/api/tickets/ticket/${ticket_id}`);
-    
+    actualStatus.value = getStatusName(ticketResponse.data.status_id);
     Categories.value = categoriesResponse.data;
-    ticketDb.value = ticketResponse.data[0];
-    actualStatus.value = ticketDb.value.status;
-    console.log("actualStatus.value :  "+ actualStatus.value);
-    if(actualStatus.value == 'OPEN' || actualStatus.value == 'open'){
-      statusIndex.value = 1;
-    }else if(actualStatus.value == 'PENDING' || actualStatus.value == 'pending'){
-      statusIndex = 2;
-    }else if(actualStatus.value == 'CLOSED' || actualStatus.value == 'closed'){
-      statusIndex = 3;
+    ticketDb.value = {
+      id: ticketResponse.data.id,
+      title: ticketResponse.data.title,
+      content : ticketResponse.data.description,
+      category_id: ticketResponse.data.category_id,
+      status: getStatusName(ticketResponse.data.status_id),
+      user_id: ticketResponse.data.user_id,
     }
-    console.log("statusIndex :  "+ statusIndex.value); 
-    console.log("ticketDb.value :  " );
-    console.log(ticketDb.value);
-    console.log("Categories.value  " );
-    console.log(Categories.value);
+      console.log("ticketDb.value.description :  ");
+      console.log(ticketDb.value.description);
+
+
+    }
+    // actualStatus.value = ticketDb.value.status;
+    // console.log("actualStatus.value :  "+ actualStatus.value);
+    // if(actualStatus.value == 'OPEN' || actualStatus.value == 'open'){
+    //   statusIndex.value = 1;
+    // }else if(actualStatus.value == 'PENDING' || actualStatus.value == 'pending'){
+    //   statusIndex = 2;
+    // }else if(actualStatus.value == 'CLOSED' || actualStatus.value == 'closed'){
+    //   statusIndex = 3;
+    // }
+    // console.log("statusIndex :  "+ statusIndex.value); 
+    // console.log("ticketDb.value :  " );
+    // console.log(ticketDb.value);
+    // console.log("Categories.value  " );
+    // console.log(Categories.value);
     
     // Rest of your code...
-  } catch (error) {
+  catch (error) {
     console.error('Error fetching data:', error);
-  }
-});
+  }}
+);
 let fromWho = ref('');
 
 function saveTicket() {
@@ -82,38 +136,73 @@ function saveTicket() {
   console.log("user.value.id: " + user.value.id);
   console.log("saveTicket");
   console.log(ticket.value);
-  if (whosAuthenticated.value == 'USER'){
-    ticket.value.status = 'FROM_USER'
-    ticket.value.fromWho = 'FROM_USER'
-    console.log("ticket.value.status from save : " + ticket.value.status);
-    console.log("ticket.value.contentUpdate from save : " + ticket.value.contentUpdate);
+  console.log("ticket.value.status from save : " + actualStatusUpdate.value);
+//   if (whosAuthenticated.value == 'USER'){
+//     ticket.value.status = 'FROM_USER'
+//     ticket.value.fromWho = 'FROM_USER'
+//     console.log("ticket.value.status from save : " + ticket.value.status);
+//     console.log("ticket.value.contentUpdate from save : " + ticket.value.contentUpdate);
 
-}else if (whosAuthenticated.value == 'ADMIN'){
-    ticket.value.fromWho = 'FROM_ADMIN'
+// }else if (whosAuthenticated.value == 'ADMIN'){
+//     ticket.value.fromWho = 'FROM_ADMIN'
 
-}else if (whosAuthenticated.value == 'RESPONSIBLE'){
-    ticket.value.fromWho = 'FROM_RESPONSIBLE'
-}
-if(ticket.value.contentUpdate  == ''){
-  ticket.value.contentUpdate = 'NO_CHANGE';
-}
+// }else if (whosAuthenticated.value == 'RESPONSIBLE'){
+//     ticket.value.fromWho = 'FROM_RESPONSIBLE'
+// }
+// if(ticket.value.contentUpdate  == ''){
+//   ticket.value.contentUpdate = 'NO_CHANGE';
+// }
 
-console.log("ticket.value.status from save : " + ticket.value.status);
-console.log("ticket.value.contentUpdate from save : " + ticket.value.contentUpdate);
-  // save to database using axios
-  if ((ticket.value.status == 0 || ticket.value.status == '0' ) && (ticket.value.contentUpdate == '' || ticket.value.contentUpdate == 'NO_CHANGE'))
-    {
-                ticket.value.contentUpdate = ''
-                toaster.show(`<div><i class="fa-solid fa-triangle-exclamation"></i> You must change something to save !</div>`, {
-                  position: "top",
-                  duration: 5000,
-                  type: "error",
+// console.log("ticket.value.status from save : " + ticket.value.status);
+// console.log("ticket.value.contentUpdate from save : " + ticket.value.contentUpdate);
+//   // save to database using axios
+//   if ((ticket.value.status == 0 || ticket.value.status == '0' ) && (ticket.value.contentUpdate == '' || ticket.value.contentUpdate == 'NO_CHANGE'))
+//     {
+//                 ticket.value.contentUpdate = ''
+//                 toaster.show(`<div><i class="fa-solid fa-triangle-exclamation"></i> You must change something to save !</div>`, {
+//                   position: "top",
+//                   duration: 5000,
+//                   type: "error",
 
-                });
-                 return;   
+//                 });
+//                  return;   
  
-    }
-  axios.post('http://localhost:8000/api/tickets', ticket.value)
+//     }
+//   axios.post('http://localhost:8000/api/tickets', ticket.value)
+//   .then(function (response) {
+//     console.log("saveTicket succes");
+
+//     console.log(response);
+//       toaster.show(`<div><i class="fa-solid fa-circle-check"></i> ticket saved successfuly !</div>`, {
+//                         position: "top",
+//                         duration: 5000,
+//                         type: "success",
+
+//                       });
+//     router.push({ name: 'ticketlist' });
+//   })
+//   .catch(function (error) {
+//     console.log(error);
+//   });
+
+
+
+}
+
+let statusT = '';
+const tiketStatus = ref({
+  status_id : '',
+  ticket_id : ticket_id,
+  changedByUser_id : user.value.id,
+});
+
+function changeStatus()
+
+{
+  // add new record to ticketstatus table 
+  tiketStatus.value.status_id = getStatusIdByName(actualStatusUpdate.value);
+
+  axios.post('http://localhost:8000/api/statuses', tiketStatus.value)
   .then(function (response) {
     console.log("saveTicket succes");
 
@@ -124,15 +213,22 @@ console.log("ticket.value.contentUpdate from save : " + ticket.value.contentUpda
                         type: "success",
 
                       });
-    router.push({ name: 'ticketlist' });
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
-
-
+                      
+                    })
+                    router.push( `/tickethistory/${ticket_id}` );
+  
 
 }
+
+function getStatusIdByName (statusName){
+  const status = statusesDb.value.find(item => item.status === statusName);
+  return status ? status.id : 'Unknown';
+}
+
+// function getStatusName(statusId) {
+//   const status = statuses.value.find(item => item.id === statusId);
+//   return status ? status.status : 'Unknown';
+// }
 
 function sidebarWidthNumf() {
   return `${sidebarWidthNum.value +40}px`;
@@ -158,6 +254,37 @@ function deleteTicket(ticketId)
     router.push('/ticketlist');
 
 }
+
+function saveComment ()
+{
+  const comment = {
+    commentContent: commentContent.value,
+    ticket_id: ticket_id,
+    user_id: user.value.id,
+  };
+  console.log("comment : " + comment);
+  axios.post('http://localhost:8000/api/comments', comment)
+  .then(function (response) {
+    console.log("saveComment succes");
+
+    console.log(response);
+      toaster.show(`<div><i class="fa-solid fa-circle-check"></i> Comment saved successfuly !</div>`, {
+                        position: "top",
+                        duration: 5000,
+                        type: "success",
+
+                      });
+                      contentUpdate.value = '';
+                      location.reload(); // Reload the page
+
+                    })
+                    .catch(function (error) {
+                      console.log(error);
+                    });
+  }
+
+
+
 const currentTimestamp = ref(getActualDate());
 
 const intervalId = setInterval(() => {
@@ -195,14 +322,19 @@ setTimeout(() => {
 
 // fetching the comments of the tickets by the ticket_id 
 const comments = ref([]);
+const statusesDb = ref([]);
+
+var users = ref([]);
 onMounted(async () => {
   try {
     const commentsResponse = await axios.get(`http://localhost:8000/api/comments/${ticket_id}`);
+    const statusesResponse = await axios.get(`http://localhost:8000/api/statuses`);
+    const usersResponse = await axios.get(`http://localhost:8000/api/users`);
+
+    users.value = usersResponse.data;
+    statusesDb.value = statusesResponse.data;
     comments.value = commentsResponse.data;
-    console.log("comments.value :  " );
-    console.log(comments.value);
-    
-    // Rest of your code...
+
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -217,6 +349,14 @@ const formatDate = (value) => {
 };
 function toTicketHisytory(){
   router.push({ name: 'TicketHistory', params: { id: ticket_id } });
+}
+function getUserNameById(user_id)
+{
+    console.log("user_id : " + user_id);
+    const user = users.value.find(item => item.id === user_id);
+    console.log("user : " );
+    console.log(user);
+    return user ? user.fullName : 'Unknown';
 }
 </script>
 
@@ -269,7 +409,7 @@ function toTicketHisytory(){
 
                <div v-if="(whosAuthenticated == 'ADMIN' || whosAuthenticated == 'RESPONSIBLE')" style="margin-right: 150px;" ><!-- //status input  -->
                       <div class="d-flex">
-                        <label class="hoverCS"  style=" margin-top: -5px; font-size: large; margin-left: 300px; margin-bottom: 15px;" for="jdd"> <span style="color: red; font-size: 25px;">{{actualStatus}}</span></label>
+                        <label class="hoverCS status"  :class="getStatusClass(actualStatus)" style=" margin-top: -5px; font-size: large; margin-left: 300px; margin-bottom: 15px;" for="jdd"> <span style=" font-size: 25px;">{{actualStatus}}</span></label>
                         <div class="input-group nput-group-sm rounded mx-5 d-flex justify-content-center "  >
                             <select v-model="actualStatusUpdate" style="width: 200px; height: 30px;" class="custom-select" id="inputGroupSelect02">
     
@@ -283,7 +423,7 @@ function toTicketHisytory(){
                           </div>
 
                           <div  style=" margin-left: 100px; margin-top: -15px; display: block; " class="d-flex justify-content-center"> 
-                            <button type="button" style="width: 140px; height: 40px; margin-left: 10px ; margin-top: 12px; font-size:12px;" @click="saveTicket()" class="btn btn-success btn-sm btn-block rounded-pill hoverC">Change Status</button>
+                            <button type="button" style="width: 140px; height: 40px; margin-left: 10px ; margin-top: 12px; font-size:12px;" @click="changeStatus()" class="btn btn-success btn-sm btn-block rounded-pill hoverC">Change Status</button>
 
                             <a style="width: 60px; height: 60px; margin-left: 10px;" @click="deleteTicket(ticketId)"  class="d-flex justify-content-center  btn btn-danger rounded-circle hoverC" href="#"> 
                                                     <div style="font-size: 20px ;margin-top: 13px; display: flex; justify-content: center;">
@@ -295,7 +435,7 @@ function toTicketHisytory(){
                         </div>
                       </div>
                       <div v-else  style="display: flex; justify-content: start; margin-left: 400px;" >
-                        <label class="hoverCS" style="font-size: large; margin-bottom: 10px;" for="jdd"><span style="color: red; font-size: 25px;">{{actualStatus}}</span></label>
+                        <label class="hoverCS status" :class="getStatusClass(actualStatus)" style="font-size: large; margin-bottom: 10px;" for="jdd"><span style=" font-size: 25px;">{{actualStatus}}</span></label>
                         <div  style=" margin-left: 100px; display: block; " class="d-flex justify-content-center"> 
                         <a style="width: 40px; height: 40px; margin-left: 100px;" @click="deleteTicket(ticketId)"  class="d-flex justify-content-center  btn btn-danger rounded-circle hoverC" href="#"> 
                                                   <div style="font-size: 20px ;margin-top: 8px; display: flex; justify-content: center;">
@@ -355,7 +495,7 @@ function toTicketHisytory(){
 
                                         </div>
                                         <div class="ticket-content" style="margin: 20px; white-space: pre-line;">
-                                                    {{ticketDb.description}}
+                                                    {{ticketDb.content}}
                                                 </div>
 
 
@@ -400,7 +540,7 @@ function toTicketHisytory(){
                                                 <div class="user d-flex flex-row align-items-center">
 
                                                 <img src="./accountLogo.png" width="30" style="margin-right: 15px;" class="user-img rounded-circle mr-2">
-                                                <span><small class="font-weight-bold text-primary" style="margin-right: 15px;">{{comment.user_id}}</small></span>
+                                                <span><small class="font-weight-bold text-primary" style="margin-right: 15px;">{{ getUserNameById(comment.user_id)}}</small></span>
                                                   
                                                 </div>
 
@@ -443,7 +583,7 @@ function toTicketHisytory(){
                                           <div class="user d-flex flex-row align-items-center">
 
                                           <img src="./accountLogo.png" width="30" style="margin-right: 15px;" class="user-img rounded-circle mr-2">
-                                          <span><small class="font-weight-bold text-primary" style="margin-right: 15px;">YOU</small> </span>
+                                          <span><small class="font-weight-bold text-primary" style="margin-right: 15px;">You'r Comment</small> </span>
                                             
                                           </div>
 
@@ -452,7 +592,7 @@ function toTicketHisytory(){
                                           </div>
                                           <div class="comment-content " style="margin:20px;">
                                             <div style="border: 10px; " class="card">
-                                          <textarea v-model="ticket.contentUpdate" class="" id="Content" rows="5" aria-label="With textarea"></textarea>
+                                          <textarea v-model="commentContent" class="" id="Content" rows="5" aria-label="With textarea"></textarea>
                                          
                                           </div>
                                           </div>
@@ -471,7 +611,7 @@ function toTicketHisytory(){
                                           </div> -->
                                           <div class="d-flex justify-content-end">
                                             <div>
-                                              <button type="button" style="width: 100px; height: 40px; margin-right: 10px;" @click="saveTicket()" class="btn btn-success btn-sm btn-block rounded-pill  hoverC ">Replay</button>
+                                              <button type="button" style="width: 100px; height: 40px; margin-right: 10px;" @click="saveComment()" class="btn btn-success btn-sm btn-block rounded-pill  hoverC ">Replay</button>
                                               <button type="button" style="width: 100px; height: 40px; margin-right: 50px;" @click="cancel()" class="btn btn-danger btn-sm btn-block rounded-pill hoverC  ">Cancel</button>
 
                                             </div>
@@ -509,7 +649,40 @@ function toTicketHisytory(){
 
 <style scoped>
 
+.status {
+  font-weight: bold;
+  margin-top: 0px;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 20px;
+  opacity: 0.5; /* Adjust the opacity value */
+  transition: opacity 0.2s; /* Add a smooth transition effect */
+}
 
+.status-open {
+  background-color: green; /* Green with transparency */
+  color: white;
+}
+
+.status-pending {
+  background-color: gold; /* Orange with transparency */
+  color: black;
+}
+
+.status-closed {
+  background-color: red; /* Red with transparency */
+  color: white;
+
+}
+
+/* ... any other status classes ... */
+
+/* On hover, increase opacity for a subtle effect */
+.status:hover {
+  opacity: 1;
+  transform: scale(1.05); /* Slightly bigger on hover */
+  opacity: 1; /* Adjust the opacity value */
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -567,23 +740,8 @@ function toTicketHisytory(){
     margin-top:20px
 }
 
-.hoverCS {
-  font-weight: bold;
-  margin-top: 0px;
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 20px;
-  opacity: 0.5; /* Adjust the opacity value */
-  transition: opacity 0.2s; /* Add a smooth transition effect */
-  background-color: gold; /* Green with transparency */
-  color: white;
-}
 
-.hoverCS:hover {
-  opacity: 1;
-  transform: scale(1.2); /* Slightly bigger on hover */
-
-}.hoverC:hover {
+.hoverC:hover {
   opacity: 1;
   transform: scale(1.2); /* Slightly bigger on hover */
 

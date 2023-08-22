@@ -5,6 +5,9 @@ import Sidebar from '../sidebar/Sidebar.vue';
 
 import { ref, onMounted } from 'vue';
 import { sidebarWidthNum } from '../sidebar/state';
+import { createToaster } from "@meforma/vue-toaster";
+
+const toaster = createToaster({ /* options */ });
 
 //get user from local storage
 const user = ref(JSON.parse(localStorage.getItem('user')));
@@ -19,13 +22,10 @@ const ticket_id = route.params.id;
 console.log("ticket_id: " + ticket_id);
 let statusT = '';
 const ticket = ref({
-    id: ticket_id,
     title: '',
-    content: '',
+    description: '',
     category_id: '',
-    status: statusT,
     user_id: '',
-    fromWho: '',
     
 });
 const ticketDb = ref({
@@ -51,24 +51,18 @@ const ticketDb = ref({
 
 
 function saveTicket() {
-  ticket.value.user_id= user.value.id;
-  console.log("user.value.id: " + user.value.id);
-  console.log("saveTicket");
-  console.log(ticket.value);
-  if (whosAuthenticated.value == 'USER'){
-    ticket.value.status = 'FROM_USER'
-    ticket.value.fromWho = 'FROM_USER'
-}else if (whosAuthenticated.value == 'ADMIN'){
-    ticket.value.fromWho = 'FROM_ADMIN'
-
-}else if (whosAuthenticated.value == 'RESPONSIBLE'){
-    ticket.value.fromWho = 'FROM_RESPONSIBLE'
-}
+  ticket.value.user_id= user.value.id; 
   // save to database using axios
+  console.log("ticket.value: " + ticket.value.user_id);
   axios.post('http://localhost:8000/api/tickets', ticket.value)
   .then(function (response) {
     console.log(response);
-    alert("Ticket Saved");
+    toaster.show(`<div><i class="fa-solid fa-circle-check"></i> Ticket Created successfuly !</div>`, {
+                        position: "top",
+                        duration: 5000,
+                        type: "success",
+
+                      });
     router.push({ name: 'ticketlist' });
   })
   .catch(function (error) {
@@ -149,11 +143,11 @@ function   cancel(){
                         </div>
                         </div></div>
 
-                  <h3 class="mx-5" style="margin-top: -20px;" for="Content" >Issue Content</h3>
+                  <h3 class="mx-5" style="margin-top: -20px;" for="Content" >Ticket Content</h3>
 
                   <div  style="margin-top: -50px;"  class="d-flex justify-content-around mx-5">  
                     <div class="input-group mt-5">
-                    <textarea v-model="ticket.content" class="form-control" id="Content" rows="5" aria-label="With textarea"></textarea>
+                    <textarea v-model="ticket.description" class="form-control" id="Content" rows="5" aria-label="With textarea"></textarea>
                     </div>
                     </div>
           </div>

@@ -10,7 +10,7 @@ router.get('/', (req: any, res: any) => {
     console.log("Get all tickets");
 
     //creat a query to get all tickets ordred by status
-    const selectQuery = 'SELECT * FROM ticket ORDER BY status DESC';
+    const selectQuery = 'SELECT * FROM ticket ORDER BY id DESC';
 
     connection.query(selectQuery, (err: any, results: any) => {
         if (err) {
@@ -26,7 +26,7 @@ router.get('/', (req: any, res: any) => {
 router.get('/:userid', (req: any, res: any) => {
     console.log("Get tickets by user id");
 
-    const selectQuery = 'SELECT * FROM ticket WHERE user_id = ?  ORDER BY status DESC';
+    const selectQuery = 'SELECT * FROM ticket WHERE user_id = ?  ORDER BY id DESC';
     const userId = req.params.userid;
 
     connection.query(selectQuery, [userId], (err: any, results: any) => {
@@ -62,171 +62,92 @@ router.delete('/:id', (req: any, res: any) => {
 });
 
 
+// CREATE A NEW TICKET AND CREAT NEW STATUS FOR IT  
 router.post('/', (req: any, res: any) => {
-    console.log("Create ticket");
-    const ticketId = req.body.id;
-    const title = req.body.title;
-    const userId = req.body.user_id;
-    var description = req.body.content;
-    const categoryId = req.body.category_id;    
+    console.log("Create new ticket");
+    const { title, description, category_id, user_id } = req.body;
     const d = new Date();
-    const formattedDate = format(d, "dd/MM/yyyy, HH:mm:ss"); // Format the date object
-    let  status =  req.body.status;
-    const fromWho = req.body.fromWho;
+    const createdAt = format(d, 'yyyy-MM-dd HH:mm:ss');
+    const status_id = 1;
+    const insertQuery = 'INSERT INTO ticket (title, description, category_id, user_id, createdAt) VALUES (?, ?, ?, ?, ?)';
+    const insertQuery2 = 'INSERT INTO ticketstatus (status_id, ticket_id,changedByUser_id, createdAt) VALUES (?,?, ?, ?)'; 
 
-    if(ticketId == 0 && fromWho == 'FROM_USER'){
-        status = "OPEN";
-        description = description+'\n';
-        const historyOfStatus = '( '+status+' ) : '+formattedDate ;
-        const insertQuery = 'INSERT INTO ticket (title, user_id, description, category_id, status, historyOfStatus) VALUES (?, ?, ?, ?, ?, ?)';
-        connection.query(insertQuery, [title, userId, description, categoryId, status, historyOfStatus], (err: any, results: any) => {
-            if (err) {
-                console.error('Error executing query:', err);
-                res.status(500).json({ error: 'Internal server error' });
-                return;
-            }
-            console.log("ticket created succesfuly By the User With tickets id = 0");
-            res.status(200).json(results);
-        }
-        );
-
-   }
-   //   else if(status == 'FROM_USER' && fromWho == 'FROM_USER')
-    // {
-    //   //update ticket by adding other lines to description 
-    //     const selectQuery = 'SELECT description,historyOfStatus FROM ticket WHERE id = ?';
-    //     connection.query(selectQuery, [ticketId], (err: any, results: any) => {
-    //         if (err) {
-    //             console.error('Error executing query:', err);
-    //             res.status(500).json({ error: 'Internal server error' });
-    //             return;
-    //         }
-    //           const description = results[0].description;
-    //           const contentUpdate = req.body.contentUpdate;
-
-    //     // updating ticket
-    //      const newDescription = description +'\nCOMMENT_'+fromWho+'('+formattedDate+') : \n'+contentUpdate+'\n\\\\\\\\\\\\\\\\\\\\\endComment///////////////\n';
- 
-    //     const updateQuery = 'UPDATE ticket SET  description = ? WHERE id = ?';
-
-    //     connection.query(updateQuery, [ newDescription, ticketId], (err: any, results: any) => {
-    //         if (err) {
-    //             console.error('Error executing query:', err);
-    //             res.status(500).json({ error: 'Internal server error' });
-    //             return;
-    //         }
-
-    //         console.log("Ticket updated successfully by User");
-    //         res.status(200).json(results);
-    //     }
-    //     );
-    //     });
+    console.log("title : " + title);
+    console.log("description : " + description);
+    console.log("category_id : " + category_id);
+    console.log("user_id : " + user_id);
+    console.log("createdAt : " + createdAt);
+    console.log("status_id : " + status_id);
 
 
-    // }
-    else if(fromWho == 'FROM_ADMIN' || fromWho == 'FROM_RESPONSIBLE')
-    {
-        //fetch ticket that have ticket id 
-        const selectQuery = 'SELECT historyOfStatus, description FROM ticket WHERE id = ?';
-        connection.query(selectQuery, [ticketId], (err: any, results: any) => {
-            if (err) {
-                console.error('Error executing query:', err);
-                res.status(500).json({ error: 'Internal server error' });
-                return;
-            }
-           const historyOfStatus = results[0].historyOfStatus;
-           const description = results[0].description;
-           const contentUpdate = req.body.contentUpdate;
-
-        // updating ticket
-        // if the descripton did not chaged 
-        if(contentUpdate == 'NO_CHANGE' )
-        {
-            const status = req.body.status;
-            const newHistoryOfStatus = historyOfStatus +',\n( '+status+' ) : '+formattedDate;
-            const updateQuery = 'UPDATE ticket SET  status = ?, historyOfStatus = ? WHERE id = ?';
-            connection.query(updateQuery, [status, newHistoryOfStatus, ticketId], (err: any, results: any) => {
-                if (err) {
-                    console.error('Error executing query:', err);
-                    res.status(500).json({ error: 'Internal server error' });
-                    return;
-                }
-
-                console.log("Ticket updated successfully by Admin or responible ");
-
-                res.status(200).json(results);
-
-            }
-            );
-        }
-        else if (status != 0 ){
-            // if the descripton chaged
-        const newDescription = description +'\nCOMMENT_'+fromWho+'('+formattedDate+') : \n'+contentUpdate+'\n\\\\\\\\\\\\\\\\\\\\\endComment///////////////\n';
-        const status = req.body.status; 
-        const newHistoryOfStatus = historyOfStatus +',\n( '+status+' ) : '+formattedDate;
-
-                console.log('status : '+status);
-                    //update the entire ticket 
-        const updateQuery = 'UPDATE ticket SET  description = ? , status = ?, historyOfStatus = ? WHERE id = ?';
-        connection.query(updateQuery, [newDescription, status, newHistoryOfStatus, ticketId], (err: any, results: any) => {
-            if (err) {
-                console.error('Error executing query:', err);
-                res.status(500).json({ error: 'Internal server error' });
-                return;
-            }
-    
-            console.log("Ticket updated successfully by Admin or responible ");
-            res.status(200).json(results);
-        }
-        );}
-            //   else if (status == 0 || status == '0' || status == 'null' || status == null || status == 'undefined' || status == undefined || status == '') {
-            //     // if the descripton chaged
-            // const newDescription = description +'\nCOMMENT_'+fromWho+'('+formattedDate+') : \n'+contentUpdate+'\n\\\\\\\\\\\\\\\\\\\\\endComment///////////////\n';
-
-
-            //             //update the entire ticket  
-            // const updateQuery = 'UPDATE ticket SET  description = ?  WHERE id = ?';
-            // connection.query(updateQuery, [newDescription, ticketId], (err: any, results: any) => {
-            //     if (err) {
-            //         console.error('Error executing query:', err);
-            //         res.status(500).json({ error: 'Internal server error' });
-            //         return;
-            //     }
-        
-            //     console.log("Ticket updated successfully by Admin or responible ");
-            //     res.status(200).json(results);
-            // }
-            // );
-
-            //     }
-                else {
-                    console.log("Ticket not updated successfully by Admin or responible ");
-                }
-
-    
-        });
-    }
-    
-});
-
-
-router.get('/ticket/:id', (req: any, res: any) => {
-
-    console.log("Get ticket by id");
-
-    const selectQuery = 'SELECT * FROM ticket WHERE id = ?';
-    const ticketId = req.params.id;
-
-    connection.query(selectQuery, [ticketId], (err: any, results: any) => {
+    connection.query(insertQuery, [title, description, category_id, user_id, createdAt], (err: any, results: any) => {
         if (err) {
             console.error('Error executing query:', err);
             res.status(500).json({ error: 'Internal server error' });
             return;
         }
-        console.log("Succes ticket id");
-        res.status(200).json(results);
+        console.log("ticket created succesfuly");
+        console.log(results);
+        console.log("ticket_id created : " + results.insertId);
+        const ticketId = results.insertId;
+        connection.query(insertQuery2, [status_id, ticketId,user_id, createdAt], (err: any, results: any) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            console.log("ticket status created succesfuly");
+            console.log(results);
+            console.log("ticket status created : " + results.insertId);
+            res.status(200).json(results);
+        });
     });
 });
+
+
+
+
+router.get('/ticket/:id', (req: any, res: any) => {
+    console.log("Get ticket by id");
+  
+    const ticketId = req.params.id;
+  
+    const selectQuery = 'SELECT * FROM ticket WHERE id = ?';
+    const selectQuery2 = 'SELECT * FROM ticketstatus WHERE ticket_id = ? ORDER BY createdAt DESC LIMIT 1';
+  
+    connection.query(selectQuery, [ticketId], (err: any, ticketResults: any) => {
+      if (err) {
+        console.error('Error executing query:', err);
+        res.status(500).json({ error: 'Internal server error' });
+        return;
+      }
+  
+      connection.query(selectQuery2, [ticketId], (err: any, statusResults: any) => {
+          if (err) {
+              console.error('Error executing query:', err);
+              res.status(500).json({ error: 'Internal server error' });
+              return;
+            }
+        const status = statusResults[0] ? statusResults[0].status_id : 'unknown';
+            console.log("status : " );
+            console.log(statusResults[0]);
+        const ticket = {
+          id: ticketResults[0].id,
+          title: ticketResults[0].title,
+          description: ticketResults[0].description,
+          status_id: status,
+          category_id: ticketResults[0].category_id,
+          user_id: ticketResults[0].user_id,
+          createdAt: ticketResults[0].createdAt,
+          historyOfStatus: ticketResults[0].historyOfStatus,
+        };
+        console.log(ticket);
+        console.log("Success ticket id");
+        res.status(200).json(ticket);
+      });
+    });
+  });
+  
 
 
 

@@ -86,7 +86,6 @@ router.push('/');
                             <th scope="col">Full Name</th>
                             <th scope="col">Email</th>
                             <th scope="col">Role</th>
-                            <th scope="col">UsersCount</th>
                             <th scope="col">ChRole</th>
                             <th scope="col">DelResp</th>
                            
@@ -99,7 +98,6 @@ router.push('/');
                                 <td>{{ responsible.fullName }}</td>
                                 <td>{{ responsible.email  }}</td>
                                 <td>{{responsible.role}}</td>
-                                <td>50</td>
                                 <td>
                                     <a @click="changeRole(responsible.id,responsible.role)" class="btn btn-sm bg-success hoverC" > <i class="fa-solid fa-clock-rotate-left"> </i></a>
                                     </td>

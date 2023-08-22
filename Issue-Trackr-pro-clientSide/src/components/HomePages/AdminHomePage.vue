@@ -127,7 +127,7 @@ onMounted(async () => {
                             <th scope="col">Full Name</th>
                             <th scope="col">Email</th>
                             <th scope="col">User Role</th>
-                            <th scope="col">Issues</th>
+                            <th scope="col">Tickets</th>
                             <th scope="col">ChRole</th>
                             <th scope="col">delUser</th>
                             
@@ -139,9 +139,9 @@ onMounted(async () => {
                             <tr v-for="user in users">
                                 <th scope="row">{{user.id}}</th>
                                 <td>{{ user.fullName }}</td>
-                                <td>{{ user.email  }}</td>
+                                <td>{{ user.email }}</td>
                                 <td>{{user.role}}</td>
-                                <td>
+                                <td class="d-flex justify-content-center ">
                                   <router-link :to="'/ticketlist/' + user.id" class="ticketscount">
                                     {{ userTicketCounts[user.id] }}
                                   </router-link>

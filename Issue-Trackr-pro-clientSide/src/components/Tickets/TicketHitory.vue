@@ -48,33 +48,72 @@ const ticket = ref({
 var statusIndex = ref(0);
 var actualStatus = ref('');
 
+
+
+async function fetchUpdatedStatus() {
+  try {
+    const response = await axios.get(`http://localhost:8000/api/tickets/ticket/${ticket_id}`);
+    ticketDb.value = {
+      id: response.data.id,
+      title: response.data.title,
+      content : response.data.description,
+      category_id: response.data.category_id,
+    
+      status: getStatusName(response.data.status_id),
+      user_id: response.data.user_id,
+    }
+    console.log("status.value :  ");
+    console.log(ticketDb.value.status);
+  } catch (error) {
+    console.error('Error fetching updated status:', error);
+  }
+}
 onMounted(async () => {
   try {
     const categoriesResponse = await axios.get('http://localhost:8000/api/categories');
     const ticketResponse = await axios.get(`http://localhost:8000/api/tickets/ticket/${ticket_id}`);
-    
+    actualStatus.value = getStatusName(ticketResponse.data.status_id);
     Categories.value = categoriesResponse.data;
-    ticketDb.value = ticketResponse.data[0];
-    actualStatus.value = ticketDb.value.status;
-    console.log("actualStatus.value :  "+ actualStatus.value);
-    if(actualStatus.value == 'OPEN' || actualStatus.value == 'open'){
-      statusIndex.value = 1;
-    }else if(actualStatus.value == 'PENDING' || actualStatus.value == 'pending'){
-      statusIndex = 2;
-    }else if(actualStatus.value == 'CLOSED' || actualStatus.value == 'closed'){
-      statusIndex = 3;
+    ticketDb.value = {
+      id: ticketResponse.data.id,
+      title: ticketResponse.data.title,
+      content : ticketResponse.data.description,
+      category_id: ticketResponse.data.category_id,
+      status: getStatusName(ticketResponse.data.status_id),
+      user_id: ticketResponse.data.user_id,
     }
-    console.log("statusIndex :  "+ statusIndex.value); 
-    console.log("ticketDb.value :  " );
-    console.log(ticketDb.value);
-    console.log("Categories.value  " );
-    console.log(Categories.value);
+      console.log("ticketDb.value  from onounted:  ");
+      console.log(getStatusName(ticketResponse.data.status_id));
+
+
+      if(actualStatus.value == 'OPEN' || actualStatus.value == 'open'){
+        statusIndex.value = 1;
+      }else if(actualStatus.value == 'PENDING' || actualStatus.value == 'pending'){
+        statusIndex = 2;
+      }else if(actualStatus.value == 'CLOSED' || actualStatus.value == 'closed'){
+        statusIndex = 3;
+      }
+    }
+    // actualStatus.value = ticketDb.value.status;
+    // console.log("actualStatus.value :  "+ actualStatus.value);
+    // if(actualStatus.value == 'OPEN' || actualStatus.value == 'open'){
+    //   statusIndex.value = 1;
+    // }else if(actualStatus.value == 'PENDING' || actualStatus.value == 'pending'){
+    //   statusIndex = 2;
+    // }else if(actualStatus.value == 'CLOSED' || actualStatus.value == 'closed'){
+    //   statusIndex = 3;
+    // }
+    // console.log("statusIndex :  "+ statusIndex.value); 
+    // console.log("ticketDb.value :  " );
+    // console.log(ticketDb.value);
+    // console.log("Categories.value  " );
+    // console.log(Categories.value);
     
     // Rest of your code...
-  } catch (error) {
+  catch (error) {
     console.error('Error fetching data:', error);
-  }
-});
+  }}
+);
 let fromWho = ref('');
 
 function saveTicket() {
@@ -133,11 +172,43 @@ console.log("ticket.value.contentUpdate from save : " + ticket.value.contentUpda
 
 
 }
+const tiketStatus = ref({
+  status_id : '',
+  ticket_id : ticket_id,
+  changedByUser_id : user.value.id,
+});
+function getStatusIdByName (statusName){
+  const status = statuses3.value.find(item => item.status === statusName);
+  return status ? status.id : 'Unknown';
+}
 
+function changeStatus()
+{
+  // add new record to ticketstatus table 
+  tiketStatus.value.status_id = getStatusIdByName(actualStatusUpdate.value);
+  console.log("tiketStatus.value.status_id : " + tiketStatus.value.status_id);
+  console.log("actualStatusUpdate.value : " + actualStatusUpdate.value);
+
+  axios.post('http://localhost:8000/api/statuses', tiketStatus.value)
+  .then(function (response) {
+    console.log("saveTicket succes");
+
+    console.log(response);
+      toaster.show(`<div><i class="fa-solid fa-circle-check"></i> ticket Status changed successfuly !</div>`, {
+                        position: "top",
+                        duration: 5000,
+                        type: "success",
+
+                      });
+                      
+                    })
+                    router.push( `/ticketdetaills/${ticket_id}` );
+  
+                }
 function sidebarWidthNumf() {
   return `${sidebarWidthNum.value +40}px`;
 }
-const statuses = ref(['OPEN','PENDING','CLOSED']);
+
 
 
 function cancel() {
@@ -217,7 +288,66 @@ const formatDate = (value) => {
 };
 function toTicketHisytory(){
   router.push({ name: 'TicketDetaills', params: { id: ticket_id } });
+};
+
+var statusByid = ref('');
+
+
+function getStatusName(statusId) {
+  const status = statuses3.value.find(item => item.id === statusId);
+  return status ? status.status : 'Unknown';
 }
+function getUserNameById(user_id)
+{
+    console.log("user_id : " + user_id);
+    const user = users.value.find(item => item.id === user_id);
+    console.log("user : " );
+    console.log(user);
+    return user ? user.fullName : 'Unknown';
+}
+
+var users = ref([]);
+var ticketstatuses = ref([]);
+var statuses = ref([]);
+onMounted(async () => {
+  try {
+    const ticketstatusesResponse = await axios.get(`http://localhost:8000/api/statuses/${ticket_id}`);
+    const statusesResponse  = await axios.get(`http://localhost:8000/api/statuses`);
+    const usersResponse = await axios.get(`http://localhost:8000/api/users`);
+    
+    users.value = usersResponse.data;
+    ticketstatuses.value = ticketstatusesResponse.data;
+    statuses.value = statusesResponse.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+});
+
+// Function to get status name based on status_id
+const statuses3 = ref([
+    { id: 1, status: 'OPEN' },
+    { id: 2, status: 'PENDING' },
+    { id: 3, status: 'CLOSED' },
+    ]);
+const statuses2 = ref([
+    'OPEN',
+    'PENDING',
+    'CLOSED',
+    ]);
+// Toggle the full description visibility
+function getStatusClass(status) {
+  if (status === 'OPEN' || status === 'open'  || status === 'Open') {
+    return 'status-open';
+  } else if (status === 'PENDING' || status === 'pending' || status === 'Pending') {
+    return 'status-pending';
+  } else if (status === 'CLOSED'  || status === 'closed'  || status === 'Closed') {
+    return 'status-closed';
+  } else {
+    return 'status-default'; // Provide a default class if status doesn't match
+  }
+}
+
+
 </script>
 
 
@@ -269,11 +399,11 @@ function toTicketHisytory(){
 
                <div v-if="(whosAuthenticated == 'ADMIN' || whosAuthenticated == 'RESPONSIBLE')" style="margin-right: 150px;" ><!-- //status input  -->
                       <div class="d-flex">
-                        <label class="hoverCS"  style=" margin-top: -5px; font-size: large; margin-left: 300px; margin-bottom: 15px;" for="jdd"> <span style="color: red; font-size: 25px;">{{actualStatus}}</span></label>
+                        <label class="status" :class="getStatusClass(actualStatus)" style=" margin-top: -5px; font-size: large; margin-left: 300px; margin-bottom: 15px;" for="jdd"> <span style=" font-size: 25px;">{{actualStatus}}</span></label>
                         <div class="input-group nput-group-sm rounded mx-5 d-flex justify-content-center "  >
                             <select v-model="actualStatusUpdate" style="width: 200px; height: 30px;" class="custom-select" id="inputGroupSelect02">
     
-                            <option v-for="(status, index) in statuses" :value="status" :key="index" >{{ status }}</option>
+                            <option v-for="(status, index) in statuses2" :value="status" :key="index" >{{ status }}</option>
                           </select>
                           
                           
@@ -283,7 +413,7 @@ function toTicketHisytory(){
                           </div>
 
                           <div  style=" margin-left: 100px; margin-top: -15px; display: block; " class="d-flex justify-content-center"> 
-                            <button type="button" style="width: 140px; height: 40px; margin-left: 10px ; margin-top: 12px; font-size:12px;" @click="saveTicket()" class="btn btn-success btn-sm btn-block rounded-pill hoverC">Change Status</button>
+                            <button type="button" style="width: 140px; height: 40px; margin-left: 10px ; margin-top: 12px; font-size:12px;" @click="changeStatus()" class="btn btn-success btn-sm btn-block rounded-pill hoverC">Change Status</button>
 
                             <a style="width: 60px; height: 60px; margin-left: 10px;" @click="deleteTicket(ticketId)"  class="d-flex justify-content-center  btn btn-danger rounded-circle hoverC" href="#"> 
                                                     <div style="font-size: 20px ;margin-top: 13px; display: flex; justify-content: center;">
@@ -295,10 +425,10 @@ function toTicketHisytory(){
                         </div>
                       </div>
                       <div v-else  style="display: flex; justify-content: start; margin-left: 400px;" >
-                        <label class="hoverCS" style="font-size: large; margin-bottom: 10px;" for="jdd"><span style="color: red; font-size: 25px;">{{actualStatus}}</span></label>
+                        <label class="status"  :class="getStatusClass(actualStatus)"  style="font-size: large; margin-bottom: 10px;" for="jdd"><span style=" font-size: 25px;">{{actualStatus}}</span></label>
                         <div  style=" margin-left: 100px; display: block; " class="d-flex justify-content-center"> 
                         <a style="width: 40px; height: 40px; margin-left: 100px;" @click="deleteTicket(ticketId)"  class="d-flex justify-content-center  btn btn-danger rounded-circle hoverC" href="#"> 
-                                                  <div style="font-size: 20px ;margin-top: 8px; display: flex; justify-content: center;">
+                                                  <div style="font-size: 20px ;margin-top: 4px; display: flex; justify-content: center;">
                                                     <i class="fa-solid fa-trash-can"></i>
   
                                                   </div>
@@ -355,7 +485,7 @@ function toTicketHisytory(){
 
                                         </div>
                                         <div class="ticket-content" style="margin: 20px; white-space: pre-line;">
-                                                    {{ticketDb.description}}
+                                                    {{ticketDb.content}}
                                                 </div>
 
 
@@ -391,7 +521,6 @@ function toTicketHisytory(){
                       </div>
         <!-- ADD NEW ISSUE  -->
         <div v-else>
-          <h1 style="margin-bottom: 10px;" >{{title}} </h1>
 <!-- 
         <table class="table table-bordered">
   <thead>
@@ -421,52 +550,23 @@ function toTicketHisytory(){
                 <thead class="thead-light">
                                                
                                     <tr style="border: 10px;"  >
-                                    <th scope="col">NavTo</th>
-                                    <th scope="col">#ticket_id</th>
-                                    <th scope="col">#user_Id</th>
-                                    <th scope="col">#Category_Id</th>
-                                    <th scope="col">Title</th>
-                                    <th colspan="3" scope="col">Content</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">createdAt</th>
-                                    <th scope="col">Action</th>
+                                        <th scope="col">#ticketStatus_id</th>
+                                        <th scope="col">#ticket_id</th>
+                                        <th scope="col">Responsible</th>
+                                        <th class="d-flex justify-content-center" scope="col">Status</th>
+                                        <th scope="col">createdAt</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 
-                                    <tr v-for="issue in issues" style="border: 10px;">
-                                       <td scope="row">
-                                           <router-link :to="{ name: 'TicketDetaills', params: { id: issue.id } }" class="btn btn-success hoverC">
-                                            <i class="fa-solid fa-arrow-right"></i>
-                                          </router-link>
-
-                                        </td>
-                                        <th scope="row">{{ issue.id }}</th>
-                                        <th scope="row">{{ issue.user_id }}</th>
-                                        <td>{{issue.category_id}}</td>
-                                        <td>{{issue.title}}</td>
-                                        <td colspan="3">
-                                          <div class="issue-description">
-                                            <div class="short-description">{{ getShortDescription(issue.description) }}</div>
-                                          </div>
-                                        </td>                                       
-                                       <td><span  class="status" :class="getStatusClass(issue.status)" >{{ issue.status }}</span></td>
-                                        <td>{{formatDate(issue.createdAt ) }}</td>
-                                        <td scope="row">
-                                            <div   class="d-flex justify-content-between">
-                                              <a v-if="whosAuthenticated == 'ADMIN'||whosAuthenticated == 'RESPONSIBLE'"  style="width: 30px; height: 30px;" class="btn btn-secondary rounded-circle" href="#"> 
-                                                <div style="font-size: 18px; display: flex; justify-content: center;">
-                                                    <i class="fa-regular fa-pen-to-square"></i>
-                                                </div>
-                                            </a>
-                                            <a style="width: 30px; height: 30px;" @click="deleteTicket(issue.id)" class="btn btn-danger rounded-circle hoverC" href="#"> 
-                                                <div style="font-size: 18px; display: flex; justify-content: center;">
-                                                  <i class="fa-solid fa-trash-can"></i>
-
-                                                </div>
-                                            </a>
-                                            </div>
-                                        </td>
+                                    <tr v-for="ticketstatus in ticketstatuses" style="border: 10px;">
+                                        <th scope="row">{{ ticketstatus.id }}</th>
+                                        <th scope="row">{{ ticketstatus.ticket_id }}</th>
+                                        <th scope="row">{{ getUserNameById(ticketstatus.changedByUser_id)}}</th>
+                                        <!-- <td>{{getStatusById(ticketstatus.status_id)}}</td>                                    -->
+                                        <td  ><span class="status d-flex justify-content-center" :class="getStatusClass(getStatusName(ticketstatus.status_id))"  >{{ getStatusName(ticketstatus.status_id) }}</span></td>
+                                        <td>{{formatDate(ticketstatus.createdAt ) }}</td>
+                                        
                                     </tr>
                                 </tbody>
                 </table>
@@ -645,6 +745,40 @@ body {
     color: green;
     cursor: pointer;
 
+}
+.status {
+  font-weight: bold;
+  margin-top: 0px;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 20px;
+  opacity: 0.5; /* Adjust the opacity value */
+  transition: opacity 0.2s; /* Add a smooth transition effect */
+}
+
+.status-open {
+  background-color: green; /* Green with transparency */
+  color: white;
+}
+
+.status-pending {
+  background-color: gold; /* Orange with transparency */
+  color: black;
+}
+
+.status-closed {
+  background-color: red; /* Red with transparency */
+  color: white;
+
+}
+
+/* ... any other status classes ... */
+
+/* On hover, increase opacity for a subtle effect */
+.status:hover {
+  opacity: 1;
+  transform: scale(1.05); /* Slightly bigger on hover */
+  opacity: 1; /* Adjust the opacity value */
 }
 </style>
         
