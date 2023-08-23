@@ -10,12 +10,16 @@ import { ref, onMounted, defineAsyncComponent } from 'vue';
 
 const whosAuthenticated = ref(localStorage.getItem('token') ? JSON.parse(localStorage.getItem('user')).role : 'NOT_AUTHENTICATED');
 const issues = ref([]); // Define 'issues' outside of conditionals
+
 const users = ref([]);
+
+
 
 // Fetching users from the database
 axios.get('http://localhost:8000/api/users/role/USER')
   .then(response => {
     users.value = response.data;
+    setTitle()
   })
   .catch(error => console.log(error));
 // Function to calculate sidebar width
@@ -47,6 +51,13 @@ onMounted(async () => {
   const ticketCounts = await Promise.all(ticketCountsPromises);
   userTicketCounts.value = Object.fromEntries(users.value.map((user, index) => [user.id, ticketCounts[index]]));
 });
+
+var title = ref('');
+var subtitle = ref('');
+async function setTitle() {
+  subtitle = 'count of Users : ' + users.value.length;
+  title = 'List of all Users';
+}
 </script>
 
 <template>

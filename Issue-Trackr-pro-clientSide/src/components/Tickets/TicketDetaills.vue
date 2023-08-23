@@ -109,85 +109,13 @@ onMounted(async () => {
 
 
     }
-    // actualStatus.value = ticketDb.value.status;
-    // console.log("actualStatus.value :  "+ actualStatus.value);
-    // if(actualStatus.value == 'OPEN' || actualStatus.value == 'open'){
-    //   statusIndex.value = 1;
-    // }else if(actualStatus.value == 'PENDING' || actualStatus.value == 'pending'){
-    //   statusIndex = 2;
-    // }else if(actualStatus.value == 'CLOSED' || actualStatus.value == 'closed'){
-    //   statusIndex = 3;
-    // }
-    // console.log("statusIndex :  "+ statusIndex.value); 
-    // console.log("ticketDb.value :  " );
-    // console.log(ticketDb.value);
-    // console.log("Categories.value  " );
-    // console.log(Categories.value);
-    
-    // Rest of your code...
+
   catch (error) {
     console.error('Error fetching data:', error);
   }}
 );
 let fromWho = ref('');
 
-function saveTicket() {
-  ticket.value.user_id= user.value.id;
-  console.log("user.value.id: " + user.value.id);
-  console.log("saveTicket");
-  console.log(ticket.value);
-  console.log("ticket.value.status from save : " + actualStatusUpdate.value);
-//   if (whosAuthenticated.value == 'USER'){
-//     ticket.value.status = 'FROM_USER'
-//     ticket.value.fromWho = 'FROM_USER'
-//     console.log("ticket.value.status from save : " + ticket.value.status);
-//     console.log("ticket.value.contentUpdate from save : " + ticket.value.contentUpdate);
-
-// }else if (whosAuthenticated.value == 'ADMIN'){
-//     ticket.value.fromWho = 'FROM_ADMIN'
-
-// }else if (whosAuthenticated.value == 'RESPONSIBLE'){
-//     ticket.value.fromWho = 'FROM_RESPONSIBLE'
-// }
-// if(ticket.value.contentUpdate  == ''){
-//   ticket.value.contentUpdate = 'NO_CHANGE';
-// }
-
-// console.log("ticket.value.status from save : " + ticket.value.status);
-// console.log("ticket.value.contentUpdate from save : " + ticket.value.contentUpdate);
-//   // save to database using axios
-//   if ((ticket.value.status == 0 || ticket.value.status == '0' ) && (ticket.value.contentUpdate == '' || ticket.value.contentUpdate == 'NO_CHANGE'))
-//     {
-//                 ticket.value.contentUpdate = ''
-//                 toaster.show(`<div><i class="fa-solid fa-triangle-exclamation"></i> You must change something to save !</div>`, {
-//                   position: "top",
-//                   duration: 5000,
-//                   type: "error",
-
-//                 });
-//                  return;   
- 
-//     }
-//   axios.post('http://localhost:8000/api/tickets', ticket.value)
-//   .then(function (response) {
-//     console.log("saveTicket succes");
-
-//     console.log(response);
-//       toaster.show(`<div><i class="fa-solid fa-circle-check"></i> ticket saved successfuly !</div>`, {
-//                         position: "top",
-//                         duration: 5000,
-//                         type: "success",
-
-//                       });
-//     router.push({ name: 'ticketlist' });
-//   })
-//   .catch(function (error) {
-//     console.log(error);
-//   });
-
-
-
-}
 
 let statusT = '';
 const tiketStatus = ref({
@@ -196,29 +124,53 @@ const tiketStatus = ref({
   changedByUser_id : user.value.id,
 });
 
-function changeStatus()
 
+function changeStatus()
 {
-  // add new record to ticketstatus table 
+  //cheking if the status is null 
+  if (actualStatusUpdate.value == 0 || actualStatusUpdate.value == '0' )
+  {
+    toaster.show(`<div><i class="fa-solid fa-triangle-exclamation"></i> You must change the status to save !</div>`, {
+      position: "top",
+      duration: 5000,
+      type: "error",
+
+    });
+     return;   
+  }
+
+  //checking if the new status is the same as the old one
+ else if (actualStatusUpdate.value == actualStatus.value)
+  {
+    toaster.show(`<div><i class="fa-solid fa-triangle-exclamation"></i> You must change the status to save !</div>`, {
+      position: "top",
+      duration: 5000,
+      type: "error",
+
+    });
+     return;   
+  }else {
+    // add new record to ticketstatus table 
   tiketStatus.value.status_id = getStatusIdByName(actualStatusUpdate.value);
+  console.log("tiketStatus.value.status_id : " + tiketStatus.value.status_id);
+  console.log("actualStatusUpdate.value : " + actualStatusUpdate.value);
 
   axios.post('http://localhost:8000/api/statuses', tiketStatus.value)
   .then(function (response) {
     console.log("saveTicket succes");
-
-    console.log(response);
-      toaster.show(`<div><i class="fa-solid fa-circle-check"></i> ticket saved successfuly !</div>`, {
+      toaster.show(`<div><i class="fa-solid fa-circle-check"></i> ticket Status changed successfuly !</div>`, {
                         position: "top",
                         duration: 5000,
                         type: "success",
 
                       });
-                      
-                    })
-                    router.push( `/tickethistory/${ticket_id}` );
-  
+                    router.push('/tickethistory/'+ticket_id);  
+                    }
+                    )
+  }
 
-}
+  
+                }
 
 function getStatusIdByName (statusName){
   const status = statusesDb.value.find(item => item.status === statusName);
@@ -240,19 +192,22 @@ function cancel() {
   router.push('/');
 }
 
+const ticketId = route.params.id;
+
 function deleteTicket(ticketId)
-
 {
-   const response = axios.delete('http://localhost:8000/api/tickets/'+ticketId);
-    console.log('Deleted succefuly')
-    toaster.show(`<div><i class="fa-solid fa-circle-check"></i> Ticket Deleted succefuly !</div>`, {
-                        position: "top",
-                        duration: 5000,
-                        type: "error",
+  console.log("ticketId : " + ticketId);
+const response = axios.delete('http://localhost:8000/api/tickets/'+ticketId)
+console.log('Deleted succefuly')
 
-                      });
-    router.push('/ticketlist');
-
+     toaster.show(`<div><i class="fa-solid fa-circle-check"></i> Ticket Deleted succefuly !</div>`, {
+                         position: "top",
+                         duration: 5000,
+                         type: "error",
+ 
+                       });
+                       router.push('/ticketlist');
+ 
 }
 
 function saveComment ()
@@ -274,9 +229,8 @@ function saveComment ()
                         type: "success",
 
                       });
-                      contentUpdate.value = '';
-                      location.reload(); // Reload the page
-
+                      commentContent.value = '';
+                      fetchComments()
                     })
                     .catch(function (error) {
                       console.log(error);
@@ -325,15 +279,35 @@ const comments = ref([]);
 const statusesDb = ref([]);
 
 var users = ref([]);
-onMounted(async () => {
+async function fetchComments() {
   try {
     const commentsResponse = await axios.get(`http://localhost:8000/api/comments/${ticket_id}`);
-    const statusesResponse = await axios.get(`http://localhost:8000/api/statuses`);
-    const usersResponse = await axios.get(`http://localhost:8000/api/users`);
-
-    users.value = usersResponse.data;
-    statusesDb.value = statusesResponse.data;
     comments.value = commentsResponse.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
+async function fetchStatuses() {
+  try {
+    const statusesResponse = await axios.get(`http://localhost:8000/api/statuses`);
+    statusesDb.value = statusesResponse.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
+async function fetchUsers() {
+  try {
+    const usersResponse = await axios.get(`http://localhost:8000/api/users`);
+    users.value = usersResponse.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
+onMounted(async () => {
+  try {
+    fetchUsers();
+    fetchComments();
+    fetchStatuses();
 
   } catch (error) {
     console.error('Error fetching data:', error);

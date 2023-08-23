@@ -24,7 +24,7 @@ router.get('/', (req: any, res: any) => {
 });
 
 router.get('/:userid', (req: any, res: any) => {
-    console.log("Get tickets by user id");
+    console.log("Get tickets by user id : " + req.params.userid);
 
     const selectQuery = 'SELECT * FROM ticket WHERE user_id = ?  ORDER BY id DESC';
     const userId = req.params.userid;
@@ -41,25 +41,101 @@ router.get('/:userid', (req: any, res: any) => {
 });
 
 router.delete('/:id', (req: any, res: any) => {
-
-    console.log("Delete ticket");
+    // Delete all statuses with this ticket id and comments with this ticket id then delete the ticket
+    console.log("Delete ticket by id");
     const ticketId = req.params.id;
-    console.log("ticket_id to delete : " + ticketId);
     const deleteQuery = 'DELETE FROM ticket WHERE id = ?';
+    const deleteQuery2 = 'DELETE FROM ticketstatus WHERE ticket_id = ?';
+    const deleteQuery3 = 'DELETE FROM comment WHERE ticket_id = ?';
 
-    connection.query(deleteQuery, [ticketId], (err: any, results: any) => {
+    connection.query(deleteQuery2, [ticketId], (err: any, results: any) => {
+
+
         if (err) {
             console.error('Error executing query:', err);
             res.status(500).json({ error: 'Internal server error' });
             return;
         }
-        console.log(" ticket Deleted succesfuly");
+        console.log("ticket statuses deleted succesfuly");
         console.log(results);
-        console.log("ticket_id deleted : " + ticketId);
-        res.status(200).json(results);
+        connection.query(deleteQuery3, [ticketId], (err: any, results: any) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            console.log("ticket comments deleted succesfuly");
+            console.log(results);
+            connection.query(deleteQuery, [ticketId], (err: any, results: any) => {
+                if (err) {
+                    console.error('Error executing query:', err);
+                    res.status(500).json({ error: 'Internal server error' });
+                    return;
+                }
+                console.log("ticket deleted succesfuly");
+                console.log(results);
+                res.status(200).json(results);
+            });
+        }
+        );
+
+
 
     });
+
+
+
+
 });
+
+//Delete More than One Ticket the ids are in the body of the request in a array
+router.post('/delete', (req: any, res: any) => {
+    // Delete all statuses with this ticket id and comments with this ticket id then delete the ticket
+    console.log("Delete tickets by ids");
+    const ticketIds = req.body;
+    const deleteQuery = 'DELETE FROM ticket WHERE id = ?';
+    const deleteQuery2 = 'DELETE FROM ticketstatus WHERE ticket_id = ?';
+    const deleteQuery3 = 'DELETE FROM comment WHERE ticket_id = ?';
+    ticketIds.forEach((ticketId: any) => {
+        connection.query(deleteQuery2, [ticketId], (err: any, results: any) => {
+
+
+            if (err) {
+                console.error('Error executing query:', err);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            console.log("ticket statuses deleted succesfuly");
+            console.log(results);
+            connection.query(deleteQuery3, [ticketId], (err: any, results: any) => {
+
+                if (err) {
+                    console.error('Error executing query:', err);
+                    res.status(500).json({ error: 'Internal server error' });
+                    return;
+                }
+                console.log("ticket comments deleted succesfuly");
+                console.log(results);
+                connection.query(deleteQuery, [ticketId], (err: any, results: any) => {
+                    if (err) {
+                        console.error('Error executing query:', err);
+                        res.status(500).json({ error: 'Internal server error' });
+                        return;
+                    }
+                    console.log("ticket deleted succesfuly");
+                    console.log(results);
+                });
+            }
+            );
+
+
+        });
+    });
+    res.status(200).json({ message: 'tickets deleted' });
+});
+
+
+
 
 
 // CREATE A NEW TICKET AND CREAT NEW STATUS FOR IT  

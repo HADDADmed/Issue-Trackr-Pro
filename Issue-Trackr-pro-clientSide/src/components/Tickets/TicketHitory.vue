@@ -68,6 +68,16 @@ async function fetchUpdatedStatus() {
     console.error('Error fetching updated status:', error);
   }
 }
+async function fetchActualStatus(){
+  try {
+    const response = await axios.get(`http://localhost:8000/api/tickets/ticket/${ticket_id}`);
+    actualStatus.value = getStatusName(response.data.status_id);
+    console.log("actualStatus.value :  ");
+    console.log(actualStatus.value);
+  } catch (error) {
+    console.error('Error fetching updated status:', error);
+  }
+}
 onMounted(async () => {
   try {
     const categoriesResponse = await axios.get('http://localhost:8000/api/categories');
@@ -184,7 +194,30 @@ function getStatusIdByName (statusName){
 
 function changeStatus()
 {
-  // add new record to ticketstatus table 
+  //cheking if the status is null 
+  if (actualStatusUpdate.value == 0 || actualStatusUpdate.value == '0' )
+  {
+    toaster.show(`<div><i class="fa-solid fa-triangle-exclamation"></i> You must change the status to save !</div>`, {
+      position: "top",
+      duration: 5000,
+      type: "error",
+
+    });
+     return;   
+  }
+
+  //checking if the new status is the same as the old one
+ else if (actualStatusUpdate.value == actualStatus.value)
+  {
+    toaster.show(`<div><i class="fa-solid fa-triangle-exclamation"></i> You must change the status to save !</div>`, {
+      position: "top",
+      duration: 5000,
+      type: "error",
+
+    });
+     return;   
+  }else {
+    // add new record to ticketstatus table 
   tiketStatus.value.status_id = getStatusIdByName(actualStatusUpdate.value);
   console.log("tiketStatus.value.status_id : " + tiketStatus.value.status_id);
   console.log("actualStatusUpdate.value : " + actualStatusUpdate.value);
@@ -192,8 +225,8 @@ function changeStatus()
   axios.post('http://localhost:8000/api/statuses', tiketStatus.value)
   .then(function (response) {
     console.log("saveTicket succes");
-
-    console.log(response);
+    fetchTicketStatuses()  
+    fetchActualStatus()
       toaster.show(`<div><i class="fa-solid fa-circle-check"></i> ticket Status changed successfuly !</div>`, {
                         position: "top",
                         duration: 5000,
@@ -202,7 +235,8 @@ function changeStatus()
                       });
                       
                     })
-                    router.push( `/ticketdetaills/${ticket_id}` );
+  }
+
   
                 }
 function sidebarWidthNumf() {
@@ -215,20 +249,25 @@ function cancel() {
   router.push('/');
 }
 
+
+const ticketId = route.params.id;
+
 function deleteTicket(ticketId)
-
 {
-   const response = axios.delete('http://localhost:8000/api/tickets/'+ticketId);
-    console.log('Deleted succefuly')
-    toaster.show(`<div><i class="fa-solid fa-circle-check"></i> Ticket Deleted succefuly !</div>`, {
-                        position: "top",
-                        duration: 5000,
-                        type: "error",
+  console.log("ticketId : " + ticketId);
+const response = axios.delete('http://localhost:8000/api/tickets/'+ticketId)
+console.log('Deleted succefuly')
 
-                      });
-    router.push('/ticketlist');
-
+     toaster.show(`<div><i class="fa-solid fa-circle-check"></i> Ticket Deleted succefuly !</div>`, {
+                         position: "top",
+                         duration: 5000,
+                         type: "error",
+ 
+                       });
+                       router.push('/ticketlist');
+ 
 }
+
 const currentTimestamp = ref(getActualDate());
 
 const intervalId = setInterval(() => {
@@ -311,12 +350,10 @@ var ticketstatuses = ref([]);
 var statuses = ref([]);
 onMounted(async () => {
   try {
-    const ticketstatusesResponse = await axios.get(`http://localhost:8000/api/statuses/${ticket_id}`);
     const statusesResponse  = await axios.get(`http://localhost:8000/api/statuses`);
     const usersResponse = await axios.get(`http://localhost:8000/api/users`);
-    
+    fetchTicketStatuses()
     users.value = usersResponse.data;
-    ticketstatuses.value = ticketstatusesResponse.data;
     statuses.value = statusesResponse.data;
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -346,7 +383,14 @@ function getStatusClass(status) {
     return 'status-default'; // Provide a default class if status doesn't match
   }
 }
-
+async function fetchTicketStatuses() {
+  try {
+    const ticketstatusesResponse = await axios.get(`http://localhost:8000/api/statuses/${ticket_id}`);
+    ticketstatuses.value = ticketstatusesResponse.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
 
 </script>
 
@@ -552,7 +596,7 @@ function getStatusClass(status) {
                                     <tr style="border: 10px;"  >
                                         <th scope="col">#ticketStatus_id</th>
                                         <th scope="col">#ticket_id</th>
-                                        <th scope="col">Responsible</th>
+                                        <th scope="col">Changed By</th>
                                         <th class="d-flex justify-content-center" scope="col">Status</th>
                                         <th scope="col">createdAt</th>
                                     </tr>

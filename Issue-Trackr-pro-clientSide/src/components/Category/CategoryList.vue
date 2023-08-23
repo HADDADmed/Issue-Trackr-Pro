@@ -6,7 +6,7 @@
     <MainNavBar></MainNavBar> 
     <div style="margin: 40px 40px 40px 0px; " :style="{ 'margin-left': sidebarWidthNumf() }" >
         <div>
-          <h1 class="d-flex justify-content-center">Category List</h1>
+          <Title :title="title" :subtitle="subtitle"></Title>
           <table class="table">
             <thead>
               <tr>
@@ -54,8 +54,10 @@ function sidebarWidthNumf() {
   
   onMounted(async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/categories');
-      categories.value = response.data;
+      const response = await axios.get('http://localhost:8000/api/categories').then(response => {
+        categories.value = response.data;
+        setTitle();
+      })
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -73,7 +75,13 @@ function sidebarWidthNumf() {
         toaster.error("Error deleting category");
       });
   }
-  
+  var title = ref('');
+var subtitle = ref('');
+async function setTitle() {
+  subtitle.value = 'count of Categories: ' + categories.value.length;
+  title.value = 'List of all Categories ';
+}
+  import Title from '@/components/Partials/Title.vue';
   </script>
   
 
@@ -85,4 +93,14 @@ function sidebarWidthNumf() {
   transform: scale(1.05); /* Slightly bigger on hover */
   opacity: 1; /* Adjust the opacity value */
   }
+  #app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+
+
+
   </style>

@@ -22,6 +22,7 @@ const newCategory = ref({
 onMounted(async () => {
   const response = await axios.get('http://localhost:8000/api/categories');
   categories.value = response.data;
+  setTitle()
 });
 
 function saveCategory() {
@@ -51,6 +52,13 @@ const props = defineProps({
     type: String,
   }
 });
+var title = ref('');
+var subtitle = ref('');
+function setTitle() {
+      title.value = 'Add new Category';
+}
+import Title from '@/components/Partials/Title.vue';
+
 </script>
 
 <template>
@@ -60,8 +68,7 @@ const props = defineProps({
     <div style="margin: 40px 40px 40px 0px; " :style="{ 'margin-left': sidebarWidthNumf() }" >
         <!-- ADD NEW CATEGORY -->
         <div>
-            <h1 style="text-align: center;">Add New Category</h1>
-
+            <Title :title="title" :subtitle="subtitle"></Title>
             <h3 class="mx-5" for="CategoryName">Category Name</h3>
             <div style="margin-bottom: 20px;" class="d-flex justify-content-around">  
                 <div class="input-group input-group-lg mx-5">
@@ -85,5 +92,12 @@ const props = defineProps({
 </template>
 
 <style scoped>
-/* Your styles here */
+ #app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+
 </style>

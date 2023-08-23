@@ -46,6 +46,7 @@ const ticketDb = ref({
     const response = await fetch('http://localhost:8000/api/categories');
     const data = await response.json();
     Categories.value = data;
+    setTitle()
     console.log(Categories.value);
 });
 
@@ -96,7 +97,14 @@ const statuses = ref(['OPEN','PENDING','CLOSED']);
 function   cancel(){
   router.push('/')
 }
-  
+
+var title = ref('');
+var subtitle = ref('');
+async function setTitle() {
+  subtitle.value = '';
+  title.value = 'Add new Ticket ';
+}
+  import Title from '@/components/Partials/Title.vue';
 </script>
 
 <template>
@@ -107,9 +115,8 @@ function   cancel(){
     <div style="margin: 40px 40px 40px 0px; " :style="{ 'margin-left': sidebarWidthNumf() }" >
         <!-- ADD NEW ISSUE  -->
         <div >
-                    <h1 style="text-align: center;" >Add New Issue</h1>
-
-                    <h3 class="mx-5" for="Title">Title</h3>
+                  <Title :title=title :subtitle=subtitle></Title>
+                      <h3 class="mx-5" for="Title">Title</h3>
 
                     <div  style="margin-bottom: 20px;" class="d-flex justify-content-around">  
 

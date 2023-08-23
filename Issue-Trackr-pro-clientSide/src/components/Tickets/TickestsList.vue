@@ -14,12 +14,16 @@ const route = useRoute();
 //making userId from the url changing dynamically
 
 const user = ref(JSON.parse(localStorage.getItem('user')));
-const userId = route.params.userId;
+const userId = route.params.userId?route.params.userId:((user.value.role =='ADMIN'||user.value.role =='RESPONSIBLE')?null:user.value.id);
+console.log("userId: " + userId);
 
 const title = ref('');
 
 console.log("user_id  :" + userId);
 
+
+// creat an array to store the ids of the tickets that we want to delete
+const ticketsToDelete = ref([]);
 
 
 function sidebarWidthNumf() {
@@ -32,39 +36,71 @@ function  formatDate(dateTimeString) {
       const year = date.getFullYear();
       return `${day}/${month}/${year}`;
     }
-
+let subtitle = ref('');
 const whosAuthenticated = ref(localStorage.getItem('token') ? JSON.parse(localStorage.getItem('user')).role : 'NOT_AUTHENTICATED');
 const issues = ref([]); // Define 'issues' outside of conditionals
+let cmp = 0;
+async function fetchIssues() {
+  try {
+    let response;
+    if (userId) {
+      response = await fetch('http://localhost:8000/api/tickets/' + userId);
+      title.value = 'List of all Tickets' ;
+      subtitle.value = 'of user with id : #' + userId + ' and name : ' + getUserNameById(userId);
 
-if ((whosAuthenticated.value === 'ADMIN' || whosAuthenticated.value === 'RESPONSIBLE')  ) {
-    if(!userId){
-      const fetchIssues = async () => {
-        const response = await fetch('http://localhost:8000/api/tickets/');
-        title.value = 'List Of All Isuues';
-        issues.value = await response.json();
-    };
-    onMounted(fetchIssues);
-    }else if(whosAuthenticated.value != 'USER' && userId)
-    {
-
-      const fetchIssues = async () => {
-        const response = await fetch('http://localhost:8000/api/tickets/'+userId);
-        title.value = 'List Isuues of user with id : '+ userId;
-        issues.value = await response.json();
-
-    };
-    onMounted(fetchIssues);
+    } else {
+      response = await fetch('http://localhost:8000/api/tickets');
+      title.value = 'List of all Tickets';
+      subtitle.value = 'of all users';
     }
-} else if (whosAuthenticated.value === 'USER') {
-    const fetchIssues = async () => {
-        const response = await fetch('http://localhost:8000/api/tickets/'+JSON.parse(localStorage.getItem('user')).id);
-        title.value = 'List Isuues of user with id : '+ JSON.parse(localStorage.getItem('user')).id;
-        issues.value = await response.json();
-    };
-    onMounted(fetchIssues);
-} else {
-    console.log("Not Authenticated");
+    const responseData = await response.json(); // Read the response body once
+    issues.value = responseData; // Use the stored response data
+  } catch (error) {
+    console.error(error);
+  }
 }
+const users = ref([]);
+async function fetchUsers() {
+  try {
+    const usersResponse = await axios.get(`http://localhost:8000/api/users`);
+    users.value = usersResponse.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
+
+onMounted(() => {
+  const user = JSON.parse(localStorage.getItem('user'));
+const whosAuthenticated = localStorage.getItem('token') ? JSON.parse(localStorage.getItem('user')).role : 'NOT_AUTHENTICATED';
+  const userId = (user && user.id) || null;
+  fetchUsers()
+  console.log(users)
+  if (whosAuthenticated === 'ADMIN' || whosAuthenticated === 'RESPONSIBLE') {
+    if (userId) {
+      fetchIssues();
+    } else if (whosAuthenticated !== 'USER' && userId) {
+      fetchIssues();
+    }
+  } else if (whosAuthenticated === 'USER') {
+    fetchIssues();
+  } else {
+    console.log("Not Authenticated");
+  }
+});
+
+function getUserNameById(user_id) {
+  console.log("user_id : " + user_id);
+  console.log("users.value : ");
+  console.log(users.value);
+
+  const user = users.value.find(item => item.id == user_id);
+
+  console.log("user : ");
+  console.log(user);
+
+  return user ? user.fullName : 'Unknown';
+}
+
 console.log("whosAuthenticated from tickett page 1: " + whosAuthenticated);
 console.log("localStorage.getItem('token'): " + localStorage.getItem('token'));
 console.log("localStorage.getItem('user'): " + localStorage.getItem('user'));
@@ -76,19 +112,23 @@ const toaster = createToaster({ /* options */ });
 
 //delete Ticket from Database 
 
-function deleteTicket(ticketId)
-
+function deleteTicket(ticketId,status = false)
 {
-   const response = axios.delete('http://localhost:8000/api/tickets/'+ticketId);
-    console.log('Deleted succefuly')
-    toaster.show(`<div><i class="fa-solid fa-circle-check"></i> Ticket Deleted succefuly !</div>`, {
-                        position: "top",
-                        duration: 5000,
-                        type: "error",
+const response = axios.delete('http://localhost:8000/api/tickets/'+ticketId).then((response) => {
+  fetchIssues();
+})  
+console.log('Deleted succefuly')
 
-                      });
-    router.push('/');
-
+   if(!status)
+   {
+     toaster.show(`<div><i class="fa-solid fa-circle-check"></i> Ticket Deleted succefuly !</div>`, {
+                         position: "top",
+                         duration: 5000,
+                         type: "error",
+ 
+                       });
+                        //  location.reload();
+   }
 }
 
 const props = defineProps({
@@ -162,6 +202,7 @@ function getStatusClass(status) {
     return 'status-default'; // Provide a default class if status doesn't match
   }
 }
+var deleteButtoonBool = ref(false);
 
 
 import LoadingSpiner from '../Partials/LoadingSpiner.vue';
@@ -171,6 +212,36 @@ const loadingSpinner = ref(true);
 setTimeout(() => {
   loadingSpinner.value = false;
 }, 2400);
+
+var selectedIssueIds = ref([]);
+console.log("selectedIssueIds: " + selectedIssueIds.value);
+
+function handleCheckboxChange() {
+console.log("selectedIssueIds: " + selectedIssueIds.value);
+if (selectedIssueIds.value.length > 0) {
+  deleteButtoonBool.value = true;
+} else {
+  deleteButtoonBool.value = false;
+}
+
+}
+function deleteMoreThanOneTicket() {
+  //deleting from database 
+  console.log("selectedIssueIds: " + selectedIssueIds.value);
+  const status = true;
+  selectedIssueIds.value.forEach(element => {
+    deleteTicket(element,status);
+  });
+  toaster.show(`<div><i class="fa-solid fa-circle-check"></i> All Tickets checked are deleted successfully !</div>`, {
+                         position: "top",
+                         duration: 5000,
+                         type: "error",
+ 
+                       });
+                    
+
+}
+import Title from '../Partials/Title.vue';
 
 </script>
 
@@ -189,7 +260,30 @@ setTimeout(() => {
                       </div>
         <!-- ADD NEW ISSUE  -->
         <div v-else>
-          <h1 style="margin-bottom: 10px;" >{{title}} </h1>
+
+        <div class="d-flex justify-content-center">
+          <div  style="margin-left: 20px;">
+           <Title :title="title" :subtitle="subtitle" ></Title>
+          </div>
+        </div>
+        <div v-if="deleteButtoonBool" style="margin-bottom:15px;" class="d-flex justify-content-center">
+          <button  @click="deleteMoreThanOneTicket()" style="width: 50px" class="btn btn-danger btn-lg rounded-pill">
+          <i class="fa-solid fa-trash-can "></i>    
+        </button>
+         <div style="
+           margin-top: 10px;
+           margin-left: 15px;
+
+          font-weight: 700;
+          font-size: 15px;
+          letter-spacing: 2px;
+          line-height: 1.5em;
+          padding-bottom: 15px;
+          position: relative;
+         ">
+         delete all the selected ticket 
+        </div>
+        </div>
 <!-- 
         <table class="table table-bordered">
   <thead>
@@ -215,10 +309,17 @@ setTimeout(() => {
 </table> -->
 
 
+
+
+
+
                 <table class="table">
                 <thead class="thead-light">
                                                
                                     <tr style="border: 10px;"  >
+                                    <th scope="col">                                      
+                                         select
+                                    </th>
                                     <th scope="col">NavTo</th>
                                     <th scope="col">#ticket_id</th>
                                     <th scope="col">#user_Id</th>
@@ -233,6 +334,20 @@ setTimeout(() => {
                                 <tbody>
                                 
                                     <tr v-for="issue in issues" style="border: 10px;">
+                                       <td >
+                                          <div style="margin: 4px;" class="form-check d-flex justify-content-center ">
+                                              <input
+                                               style="width: 20px;
+                                                height: 20px;
+                                               "
+                                                class="form-check-input border shadow rounded"
+                                                type="checkbox"
+                                                :value="issue.id"
+                                                v-model="selectedIssueIds"
+                                                @change="handleCheckboxChange"
+                                              >                                          
+                                        </div>
+                                       </td>
                                        <td scope="row">
                                            <router-link :to="{ name: 'TicketDetaills', params: { id: issue.id } }" class="btn btn-success hoverC">
                                             <i class="fa-solid fa-arrow-right"></i>
@@ -252,15 +367,15 @@ setTimeout(() => {
                                         <td>{{formatDate(issue.createdAt ) }}</td>
                                         <td scope="row">
                                             <div   class="d-flex justify-content-between">
-                                              <a v-if="whosAuthenticated == 'ADMIN'||whosAuthenticated == 'RESPONSIBLE'"  style="width: 30px; height: 30px;" class="btn btn-secondary rounded-circle" href="#"> 
-                                                <div style="font-size: 18px; display: flex; justify-content: center;">
-                                                    <i class="fa-regular fa-pen-to-square"></i>
-                                                </div>
-                                            </a>
+                                              <div v-if="whosAuthenticated == 'ADMIN'||whosAuthenticated == 'RESPONSIBLE'">
+                                                <router-link :to="{ name: 'TicketDetaills', params: { id: issue.id } }" class="btn btn-secondary rounded-circle" >
+                                          <i class="fa-regular fa-pen-to-square"></i>
+                                          </router-link>
+                                      
+                                              </div>
                                             <a style="width: 30px; height: 30px;" @click="deleteTicket(issue.id)" class="btn btn-danger rounded-circle hoverC" href="#"> 
                                                 <div style="font-size: 18px; display: flex; justify-content: center;">
                                                   <i class="fa-solid fa-trash-can"></i>
-
                                                 </div>
                                             </a>
                                             </div>
@@ -271,24 +386,7 @@ setTimeout(() => {
 
 
 
-                <Modal v-model:visible=" isVisible" >
-              <!-- <label style="font-size: large; margin-left: 300px; margin-bottom: 10px;" for="jdd"> Actual Status : <span style="color: red; font-size: 25px;">{{actualStatus}}</span></label> -->
-                    <div class="input-group nput-group-lg rounded mx-5 d-flex justify-content-center "  >
-                        <select v-model="actualStatusUpdate" style="width: 200px;" class="custom-select" id="inputGroupSelect02">
-
-                        <option v-for="(status, index) in statuses" :value="index + 1" :key="index" :selected="index + 1 === 1">{{ status }}</option>
-                        </select>
-
-                          
-                        <div class="input-group-append input-group-lg" style="margin-left: 7px;">
-                          <label class="input-group-text" for="inputGroupSelect02">Status</label>
-                        </div>
-                        <div  style=" margin-left: 100px; display: block; ">
-                        <button type="button" style="width: 50px; height: 50px;" @click="saveTicket()" class="btn btn-success btn-lg btn-block rounded-circle ">S</button>
-                        <button type="button" style="width: 50px; height: 50px;" class="btn btn-danger btn-lg btn-block rounded-circle ">C</button>
-                </div>
-                        </div>
-              </Modal>
+            
         </div>
 </div>
 </div>
@@ -492,4 +590,5 @@ setTimeout(() => {
   transform: scale(1.2); /* Slightly bigger on hover */
 
 } 
+
 </style>

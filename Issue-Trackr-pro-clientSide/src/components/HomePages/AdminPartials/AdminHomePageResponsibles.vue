@@ -14,25 +14,41 @@ const toaster = createToaster({ /* options */ });
 
 // fetching users from the database
 import axios from 'axios';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 const users = ref([]);
-axios.get('http://localhost:8000/api/users/role/USER')
+async function fetchUsers() {
+  axios.get('http://localhost:8000/api/users/role/USER')
   .then(response => {
     users.value = response.data;
   })
   .catch(error => console.log(error));
+}
 
 // fetching responsibles from the database
 
 const responsibles = ref([]);
-axios.get('http://localhost:8000/api/users/role/RESPONSIBLE')
+async function fetchResponsibles() {
+  axios.get('http://localhost:8000/api/users/role/RESPONSIBLE')
   .then(response => {
     responsibles.value = response.data;
+    setTitle();
+
   })
   .catch(error => console.log(error));
+}
+
+onMounted(async () => {
+  fetchUsers();
+  fetchResponsibles();
+});
 
 const props = defineProps(['whatShouldIDisplay'])
-
+var title = ref('');
+var subtitle = ref('');
+async function setTitle() {
+  subtitle = 'count of Responsibles : ' + responsibles.value.length;
+  title = 'List of all Responsibles';
+}
 
 const ADMIN =   'ADMIN';
 let newRole = '';
@@ -68,7 +84,24 @@ function changeRole(userId, oldRole) {
 router.push('/');
 
 }
+import Title from '@/components/Partials/Title.vue';
 
+function deleteUser(userId) {
+  
+  axios.delete(`http://localhost:8000/api/users/${userId}`)
+    .then(response => {
+      fetchResponsibles();
+      toaster.show(`<div><i class="fa-solid fa-circle-check"></i> User Deleted Successfuly !</div>`, {
+                        position: "top",
+                        duration: 5000,
+                        type: "error",
+                      });
+    })
+    .catch(error => {
+      console.error('Error deleting user:', error);
+      toaster.error("Error deleting user");
+    });
+}
 </script>
 <template> 
 
@@ -78,8 +111,8 @@ router.push('/');
 
     <div style="margin: 40px 40px 40px 0px; " :style="{ 'margin-left': sidebarWidthNumf() }" >
         <div v-if="whatShouldIDisplay == 'USERS'"></div>
-             <h1 style="font-size: 40px;    " >List of All Responsibles </h1>
-                            <table class="table">
+           <Title :title=title :subtitle=subtitle></Title>
+       <table class="table">
                         <thead>
                             <tr>
                             <th scope="col">#</th>
@@ -102,7 +135,7 @@ router.push('/');
                                     <a @click="changeRole(responsible.id,responsible.role)" class="btn btn-sm bg-success hoverC" > <i class="fa-solid fa-clock-rotate-left"> </i></a>
                                     </td>
                                     <td>
-                                    <a href="#" class="btn btn-sm bg-danger hoverC" > <i class="fa-regular fa-trash-can"></i></a>
+                                    <a @click="deleteUser(responsible.id)" class="btn btn-sm bg-danger hoverC" > <i class="fa-regular fa-trash-can"></i></a>
                                     </td>
                                 </tr>
                         

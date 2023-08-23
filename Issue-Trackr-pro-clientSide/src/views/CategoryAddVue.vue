@@ -6,5 +6,4 @@ import CategoryAdd from '@/components/Category/CategoryAdd.vue'
 
    <CategoryAdd>
    </CategoryAdd>
- 
 </template>

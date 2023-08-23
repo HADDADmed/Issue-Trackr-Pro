@@ -12,6 +12,7 @@ import TicketDetaills from '../views/TicketDetaillsVue.vue'
 import TicketHitory from '../views/TicketHitoryVue.vue'
 import CategoryAdd from '../views/CategoryAddVue.vue'
 import CategoryList from '../views/CategoryListVue.vue'
+import UserAdd from '../views/UserAddVue.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -74,6 +75,10 @@ const router = createRouter({
       path: '/categorylist',
       name: 'CategoryList',
       component: CategoryList
+    },{
+      path: '/useradd',
+      name: 'UserAdd',
+      component: UserAdd
     }
   ]
 })

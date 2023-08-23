@@ -19,7 +19,6 @@ function sidebarWidthNumf() {
 // fetching users from the database
 import axios from 'axios';
 import { ref,onMounted } from 'vue';
-const users = ref([]);
 let newRole = '';
 
 // changeRole function
@@ -55,21 +54,52 @@ router.push('/homeadminresponsibles');
 }
 
 
-axios.get('http://localhost:8000/api/users/role/USER')
+const users = ref([]);
+async function fetchUsers() {
+  axios.get('http://localhost:8000/api/users/role/USER')
   .then(response => {
     users.value = response.data;
   })
   .catch(error => console.log(error));
+}
 
 // fetching responsibles from the database
 
 const responsibles = ref([]);
-axios.get('http://localhost:8000/api/users/role/RESPONSIBLE')
+async function fetchResponsibles() {
+  axios.get('http://localhost:8000/api/users/role/RESPONSIBLE')
   .then(response => {
     responsibles.value = response.data;
+    setTitle();
+
   })
   .catch(error => console.log(error));
+}
 
+onMounted(async () => {
+  fetchUsers();
+  fetchResponsibles();
+  setTitle();
+
+});
+
+
+function deleteUser(userId) {
+  
+  axios.delete(`http://localhost:8000/api/users/${userId}`)
+    .then(response => {
+      fetchUsers();
+      toaster.show(`<div><i class="fa-solid fa-circle-check"></i> User Deleted Successfuly !</div>`, {
+                        position: "top",
+                        duration: 5000,
+                        type: "error",
+                      });
+    })
+    .catch(error => {
+      console.error('Error deleting user:', error);
+      toaster.error("Error deleting user");
+    });
+}
   const props = defineProps(['whosAuthenticated'])
 
 const whatShouldIDisplay = ref('USERS') // USERS or RESPONSIBLES
@@ -97,8 +127,16 @@ async function countTicketsbyUser(userId) {
 
 
 const userTicketCounts = ref({});
-
 // Fetch data on component mount
+var subtitle = ref('');
+var title = ref('');
+async function setTitle() {
+  subtitle = 'count of Users : ' + users.value.length;
+  title = 'List of all Users';
+}
+// onMounted(
+//   setTitle()
+// )
 onMounted(async () => {
   console.log('Number of tickets:', await countTicketsbyUser(7));
   
@@ -106,7 +144,11 @@ onMounted(async () => {
   const ticketCountsPromises = users.value.map(user => countTicketsbyUser(user.id));
   const ticketCounts = await Promise.all(ticketCountsPromises);
   userTicketCounts.value = Object.fromEntries(users.value.map((user, index) => [user.id, ticketCounts[index]]));
+
+  console.log("subtitel "+subtitle);
+
 });
+import Title from '@/components/Partials/Title.vue';
 </script>
 
 <template>
@@ -119,7 +161,8 @@ onMounted(async () => {
 <!-- list of Normal users  -->
 <div style="margin: 40px 40px 40px 0px; " :style="{ 'margin-left': sidebarWidthNumf() }" >
 
-                        <h1 style="font-size: 35px; " >List  Of All Users</h1>
+                         <Title :title="title" :subtitle="subtitle" ></Title>
+
                             <table class="table" style="border: 10px;" >
                         <thead>
                             <tr>
@@ -150,7 +193,7 @@ onMounted(async () => {
                                     <a @click="changeRole(user.id,user.role)" class="btn btn-sm bg-success hoverC" > <i class="fa-solid fa-clock-rotate-left"> </i></a>
                                     </td>
                                     <td>
-                                    <a href="#" class="btn btn-sm bg-danger hoverC" > <i class="fa-regular fa-trash-can"></i></a>
+                                    <a @click="deleteUser(user.id)" class="btn btn-sm bg-danger hoverC" > <i class="fa-regular fa-trash-can"></i></a>
                                     </td>
                                 
                                 </tr>
