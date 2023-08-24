@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const connection = require('../DataBaseManager/dbConnection'); // Adjust the path as needed
 
-
 router.get('/', (req:any, res:any) => {
     connection.query('SELECT * FROM category', (err:any, rows:any, fields:any) => {
         if (!err) {
@@ -15,6 +14,7 @@ router.get('/', (req:any, res:any) => {
     });
 
 });
+
 
 router.get('/:id', (req:any, res:any) => {
     connection.query('SELECT * FROM category WHERE id = ?', [req.params.id], (err:any, rows:any, fields:any) => {
@@ -29,11 +29,13 @@ router.get('/:id', (req:any, res:any) => {
 
 });
 
+
 router.post('/', (req:any, res:any) => {
+
     let category = req.body;
-
+    
+    
     connection.query('INSERT INTO category SET ?', category, (err:any, rows:any, fields:any) => {
-
 
         if (!err) {
             res.json(rows);

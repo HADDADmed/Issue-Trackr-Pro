@@ -14,6 +14,20 @@ import CategoryAdd from '../views/CategoryAddVue.vue'
 import CategoryList from '../views/CategoryListVue.vue'
 import UserAdd from '../views/UserAddVue.vue'
 
+function checkAuth(to, from, next) {
+
+  if(to.name == 'login'){
+    localStorage.removeItem('token')
+    next()
+  }else if (localStorage.getItem('token') == null) {
+    next('/login')
+  } else {
+    next()
+  }
+  
+}
+
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -82,5 +96,7 @@ const router = createRouter({
     }
   ]
 })
+
+router.beforeEach(checkAuth)
 
 export default router

@@ -14,7 +14,7 @@ onMounted(() => {
 
 <template>
         <div > <NotAuthenticatedNavBar></NotAuthenticatedNavBar> </div>
-        <!DOCTYPE html>
+
 
 
 <section class="bg">

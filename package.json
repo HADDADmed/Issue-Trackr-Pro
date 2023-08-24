@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "cd ./Issue-Trackr-pro-clientSide && npm run dev",
-    "client": "cd ./Issue-Trackr-pro-serverSide && npm run start",
+    "server": "cd ./Tickets-Flow-Plus-clientSide && npm run dev",
+    "client": "cd ./Tickets-Flow-Plus-serverSide && npm run start",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "author": "",
