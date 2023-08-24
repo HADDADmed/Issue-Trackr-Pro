@@ -22,9 +22,9 @@ onMounted(() => {
 
   <section class="hero">
     <div class="hero-content">
-      <h3>Welcome to  </h3>
-      <h1>IssuesTrackerPro</h1>
-      
+    
+        <h1>the <span style="font-size: 80px; font-weight: 800px; font-family: Brush Script MT;" >Ticket Flow Plus</span>  app</h1> 
+
       <a href="/login" class="cta-button">Login</a>
     </div>
   </section>
@@ -42,7 +42,7 @@ onMounted(() => {
   </section>
 
   <footer class="footer">
-    <p>&copy; IssuesTrackerPro. All rights reserved.</p>
+    <p>&copy; TicketsFlowPlus.      All rights reserved.</p>
   </footer>
 
 </section>
@@ -51,6 +51,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -117,10 +118,17 @@ body {
 
 }
 
-.hero-content {
+.hero-content h1 {
   max-width: 800px;
   margin: 0 auto;
+  color: white;
+  text-shadow: 
+    -2px -2px 0 black,
+    2px -2px 0 black,
+    -2px 2px 0 black,
+    2px 2px 0 black;
 }
+
 
 .hero h1 {
   font-size: 36px;

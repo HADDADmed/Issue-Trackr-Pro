@@ -59,7 +59,7 @@ function LogOut() { // Accept router as a parameter
 
   cursor: pointer;
   position: relative;
-  font-weight: 400;
+  font-weight: 500;
   user-select: none;
 
   margin: 0.1em 0;

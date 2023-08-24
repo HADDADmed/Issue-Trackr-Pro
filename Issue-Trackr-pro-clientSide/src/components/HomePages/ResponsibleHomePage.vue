@@ -98,13 +98,11 @@ async function setTitle() {
         <td>{{ user.fullName }}</td>
         <td>{{ user.email  }}</td>
         <td>{{user.role}}</td>
-       
            <td class="d-flex justify-content-center"  >
             <router-link :to="'/ticketlist/' + user.id" class="ticketscount">
               {{ userTicketCounts[user.id] }}
             </router-link>
           </td>
-
         </tr>
 
 </tbody>

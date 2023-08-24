@@ -59,6 +59,8 @@ async function fetchUsers() {
   axios.get('http://localhost:8000/api/users/role/USER')
   .then(response => {
     users.value = response.data;
+    setTitle()
+
   })
   .catch(error => console.log(error));
 }
@@ -132,6 +134,7 @@ var subtitle = ref('');
 var title = ref('');
 async function setTitle() {
   subtitle = 'count of Users : ' + users.value.length;
+  console.log("subtitel "+subtitle);
   title = 'List of all Users';
 }
 // onMounted(

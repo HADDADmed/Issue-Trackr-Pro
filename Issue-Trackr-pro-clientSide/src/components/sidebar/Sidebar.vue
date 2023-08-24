@@ -16,8 +16,7 @@ import { collapsed, toggleSidebar, sidebarWidth } from './state'
         
       </span>
       <span v-else>
-         <img style="width: 150px; margin-left: 15px; margin-top: 10px;" src="./Logocroped.png"  alt="Logo">        
-         <img style="width: 60px;  margin-top: -5px;" src="./LogoPro.png"  alt="Logo">
+         
       </span>
       
     </h1>
@@ -25,8 +24,11 @@ import { collapsed, toggleSidebar, sidebarWidth } from './state'
 
       <div v-if="whosAuthenticated == 'USER'">
     
-  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/" icon="fas fa-users">Home Page</SidebarLink>
-  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketlist" icon="fas fa-columns">List Of All Issues</SidebarLink>
+  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/" icon="fas fa-home">Home Page</SidebarLink>
+  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketlist" icon="fa-solid fa-ticket">All Tickets</SidebarLink>
+  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketsadd/0" icon="fa-solid fa-plus">New Ticket</SidebarLink>
+  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/notifpage" icon="fa-solid fa-bell">Recents updates</SidebarLink>
+
 
       </div>
       <div v-else-if="whosAuthenticated == 'ADMIN'">
@@ -36,12 +38,16 @@ import { collapsed, toggleSidebar, sidebarWidth } from './state'
   <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/categorylist" icon="fas fa-columns">Categories</SidebarLink>
   <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/categoryadd" icon="fa-solid fa-plus">New Category</SidebarLink>
   <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/useradd" icon="fa-solid fa-plus">New User</SidebarLink>
+  <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/notifpage" icon="fa-solid fa-bell">Recents updates</SidebarLink>
+
 
         </div>
         <div v-if="whosAuthenticated == 'RESPONSIBLE'">
     
-    <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/" icon="fas fa-users">Home Page </SidebarLink>
-    <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketlist" icon="fas fa-users">List Of All Issues</SidebarLink>
+    <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/" icon="fas fa-home">Home Page </SidebarLink>
+    <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/ticketlist" icon="fa-solid fa-ticket">All Tickets</SidebarLink>
+    <SidebarLink style="margin-left: -10px; margin-top: 15px;" to="/notifpage" icon="fa-solid fa-bell">Recents updates</SidebarLink>
+
 
         </div>
 
@@ -84,7 +90,7 @@ import { collapsed, toggleSidebar, sidebarWidth } from './state'
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
 
-  transition: 0.3s ease;
+  transition: 0.5s ease;
 
   display: flex;
   flex-direction: column;
@@ -135,7 +141,7 @@ import { collapsed, toggleSidebar, sidebarWidth } from './state'
 
 .rotate-180 {
   transform: rotate(180deg);
-  transition: 0.3s linear;
+  transition: 0.4s linear;
 }
 
 </style>

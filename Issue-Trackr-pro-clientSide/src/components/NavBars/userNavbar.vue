@@ -9,7 +9,7 @@ const router = useRouter();
 
 const user = ref(JSON.parse(localStorage.getItem('user')));
 
-console.log(user.value);
+console.log('User Nav Bar loaded')
 
 const isNavbarOpen = ref(false);
 const isDropdownOpen = ref(false);
@@ -32,9 +32,11 @@ function logOut() {
 <template>
   <div :style="{ 'margin-left': sidebarWidth }">
     <nav style="background-color: #1f4e7a;" class="navbar navbar-expand-lg navbar-dark ">
-      
       <div style="display: flex; justify-content: end;" class="collapse navbar-collapse" :class="{ 'show': isNavbarOpen }" id="navbarSupportedContent">
-        <a style="font-size: 15px;" class="navbar-brand "  href="#">{{user.fullName}}</a>
+        <div style=" margin-right: 60px;" class=" btn bg-light  rounded-circle"> 
+          <i class="fa-regular fa-bell"></i>
+        </div>
+        <a style=" font-size: 15px;" class="navbar-brand "  href="#">{{user.fullName}}</a>
         <ul class="navbar-nav">
             <li style="margin-right: 50px;" class="nav-item dropdown">
               <a  href="#" id="navbarDropdown" role="button" @click="toggleDropdown" aria-haspopup="true" aria-expanded="false">

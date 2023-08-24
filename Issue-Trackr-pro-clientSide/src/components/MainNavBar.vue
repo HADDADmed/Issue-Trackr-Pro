@@ -4,10 +4,8 @@ import  AdminNavBar from './NavBars/AdminNavbar.vue'
 import  ResponsibleNavBar from './NavBars/ResponsibleNavbar.vue'
 import NotAuthenticatedNavBar from './NavBars/NotAuthenticatedNavbar.vue'
 import { onMounted, ref } from 'vue';
-
 const whosAuthenticated = ref(localStorage.getItem('token') ? JSON.parse(localStorage.getItem('user')).role : 'NOT_AUTHENTICATED');
-console.log("FROM main NAV 1  "+whosAuthenticated.value);
-
+console.log('Main Nav Bar loaded')
 </script>
 
 <template>

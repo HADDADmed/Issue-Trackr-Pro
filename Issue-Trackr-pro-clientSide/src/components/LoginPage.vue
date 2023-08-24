@@ -72,27 +72,18 @@ export default {
       }
     },
     async login() {
-
-          console.log('test1')
-          console.log(this.mail)
-          console.log(this.password)
           try {
-          console.log('test2')
           const response = await axios.post('http://localhost:8000/api/users/login', {
           email: this.mail,
           password: this.password
           })
-          console.log ('logged in !')
-          console.log(this.mail)
-          console.log(this.password)
-          console.log(response)
           localStorage.setItem('user', JSON.stringify(response.data.user));
           localStorage.setItem('token', response.data.token);
           //set whosAuthenticated to the local storage
           localStorage.setItem('whosAuthenticated', JSON.stringify(response.data.user.role));
           const whosAuthenticated = localStorage.getItem('whosAuthenticated');
           console.log("whosAuthenticated From Login: " + whosAuthenticated); 
-          toaster.show(`<div><i class="fa-solid fa-circle-check"></i> Welcome  ${response.data.user.fullName} to IssuesTrackerPro !</div>`, {
+          toaster.show(`<div><i class="fa-solid fa-circle-check"></i> Welcome  ${response.data.user.fullName} to TicketsFlowPlus !</div>`, {
               position: "top",
               duration: 5000,
               type: "success",
@@ -133,8 +124,8 @@ export default {
 <div class="page">
   <div class="container">
     <div class="left">
-      <div class="login">Login to IssuesTrackrPro</div>
-      <div class="eula">Welcome to IssuesTrackerPro! Log in to manage and track your project issues efficiently. <br> By logging in you agree to our terms and conditions.</div>
+      <div class="login">Login to TicketsFlowPlus</div>
+      <div class="eula">Welcome to TicketsFlowPlus ! <br> By logging in you agree to our terms and conditions.</div>
       <p style="color: red; text-align: center;  margin-top:-10px;font-size:20px;" v-if="errorMessage"> {{ errorMessage }}</p>
 
     </div>
@@ -239,7 +230,7 @@ body {
 .login {
     text-align: center;
 
-  font-size: 35px;
+  font-size: 30px;
   font-weight: 800;
   margin: 10px 10px 20px;
 }

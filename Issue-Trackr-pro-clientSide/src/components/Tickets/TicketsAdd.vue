@@ -46,7 +46,9 @@ const ticketDb = ref({
     const response = await fetch('http://localhost:8000/api/categories');
     const data = await response.json();
     Categories.value = data;
+
     setTitle()
+    console.log('hello')
     console.log(Categories.value);
 });
 
@@ -130,7 +132,7 @@ async function setTitle() {
 
                       <div class="input-group nput-group-lg rounded ">
                         <select  v-model="ticket.category_id" style="width: 200px;" class="custom-select" id="inputGroupSelect02">
-                          <option v-for="(category, index) in Categories" :value="index + 1" :key="index">{{ category.name }}</option>
+                          <option v-for="(category, index) in Categories" :value="category.id" :key="index">{{ category.name }}</option>
                         </select>
                         <div class="input-group-append input-group-lg" style="margin-left: 7px;">
                           <label class="input-group-text" for="inputGroupSelect02">Category</label>
@@ -170,9 +172,7 @@ async function setTitle() {
 
 <style scoped>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  
   color: #2c3e50;
 }
 

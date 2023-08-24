@@ -31,6 +31,9 @@ function logOut() {
     <nav style="background-color: #1f4e7a;" class="navbar navbar-expand-lg navbar-dark ">
       
       <div style="display: flex; justify-content: end;" class="collapse navbar-collapse" :class="{ 'show': isNavbarOpen }" id="navbarSupportedContent">
+        <div style=" margin-right: 60px;" class=" btn bg-light  rounded-circle"> 
+          <i class="fa-regular fa-bell"></i>
+        </div>
         <a style="font-size: 15px;" class="navbar-brand "  href="#">{{user.fullName}} <span style="color: red;">ADMIN</span></a>
 
         <ul class="navbar-nav">

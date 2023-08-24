@@ -4,20 +4,9 @@ import AdminHomePage from './HomePages/AdminHomePage.vue';
 import ResponsibleHomePage from './HomePages/ResponsibleHomePage.vue';
 import NotAuthenticatedHomePage from './HomePages/NotAuthenticatedHomePage.vue';
 import MainNavBar from './MainNavBar.vue';
-
-
-
-
-
 import { ref, onMounted } from 'vue';
 const whosAuthenticated = ref(localStorage.getItem('token') ? JSON.parse(localStorage.getItem('user')).role : 'NOT_AUTHENTICATED');
-
-console.log("whosAuthenticated From Home Page 1: " + whosAuthenticated.value);
-console.log("localStorage.getItem('token'): " + localStorage.getItem('token'));
-console.log("localStorage.getItem('token'): " + localStorage.getItem('token'));
-console.log("localStorage.getItem('whosAuthenticated'): " + localStorage.getItem('whosAuthenticated'));
-
-console.log("whosAuthenticated From Home Page 3: " + whosAuthenticated.value  );
+console.log('Main Home Page loaded')
 
 </script>
 
