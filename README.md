@@ -1,6 +1,6 @@
 # Ticket Management App
 
-This is a web application designed to manage and track issues using GitHub-like tickets (issues).
+This is a web application designed to manage and track Tickets  the applictaion called Tickets Flow Plus.
 
 ## Features
 
@@ -12,7 +12,7 @@ This is a web application designed to manage and track issues using GitHub-like 
 ## Tech Stack
 
 - Frontend: Vue.js (Css framworks (bootstrap,tailwindCss) )
-- Backend: Node.js with Express
+- Backend: Node.js with Express (JWT ,BYCRIPT.... )
 - Database: MySQL
 
 ## Installation
@@ -29,6 +29,8 @@ This is a web application designed to manage and track issues using GitHub-like 
 2. Run `npm install` to install dependencies.
 3. Set up your MySQL database and update `.env` with the database details.
 4. Run `npm start` to start the backend server using (nodemone).
+
+
 
 ## Contributing
 
