@@ -1,6 +1,6 @@
 # Ticket Management App
 
-This is a web application designed to manage and track Tickets  the applictaion called Tickets Flow Plus.
+This is a web application designed to manage and track Tickets  the applictaion called Tickets Flow .
 
 ## Features
 
