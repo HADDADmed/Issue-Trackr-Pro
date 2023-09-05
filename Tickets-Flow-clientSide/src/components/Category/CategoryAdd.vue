@@ -6,7 +6,7 @@ import { sidebarWidthNum } from '../sidebar/state';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { createToaster } from "@meforma/vue-toaster";
-
+import RouterLinks from '../Partials/RouterLinks/RouterLinks.vue';
 const toaster = createToaster({ /* options */ });
 
 const user = ref(JSON.parse(localStorage.getItem('user')));
@@ -58,7 +58,24 @@ function setTitle() {
       title.value = 'Add new Category';
 }
 import Title from '@/components/Partials/Title.vue';
+import ListVue from '@/components/Partials/Lists/ListVue.vue';
 
+function sayHello() {
+  alert('Hello!');
+}
+function sayHello2() {
+  alert('Hello2!');
+}
+function sayHello3() {
+  alert('Hello3!');
+}
+
+let functions = [sayHello, sayHello2, sayHello3];
+let bool = true;
+onMounted(() => {
+  console.log('mounted');
+  bool = true;
+});
 </script>
 
 <template>
@@ -67,9 +84,13 @@ import Title from '@/components/Partials/Title.vue';
     <MainNavBar></MainNavBar> 
     <div style="margin: 40px 40px 40px 0px; " :style="{ 'margin-left': sidebarWidthNumf() }" >
         <!-- ADD NEW CATEGORY -->
+        <!-- <RouterLinks to="/" icon="fa-solid fa-home" classeR=""  inlineText="home">Home</RouterLinks> -->
+        <ListVue ></ListVue>
+        <!-- <ListVue :listTitles="listTitles" :users="users" :userTicketCounts="userTicketCounts" :changeRole="changeRole" :deleteUser="deleteUser"></ListVue> -->
+
         <div>
-            <Title :title="title" :subtitle="subtitle"></Title>
-            <h3 class="mx-5" for="CategoryName">Category Name</h3>
+          <Title :title="title" :subtitle="subtitle"></Title>
+          <h3 class="mx-5" for="CategoryName">Category Name</h3>
             <div style="margin-bottom: 20px;" class="d-flex justify-content-around">  
                 <div class="input-group input-group-lg mx-5">
                     <input type="text" class="form-control" v-model="newCategory.name" id="CategoryName" placeholder="Enter Category Name">
@@ -78,7 +99,9 @@ import Title from '@/components/Partials/Title.vue';
 
             <h3 class="mx-5" for="CategoryDescription">Category Description</h3>
             <div class="d-flex justify-content-around mx-5">  
-                <div class="input-group mt-2">
+                                       
+                            
+                            <div class="input-group mt-2">
                     <textarea v-model="newCategory.description" class="form-control" id="CategoryDescription" rows="5" aria-label="With textarea"></textarea>
                 </div>
             </div>
@@ -89,6 +112,8 @@ import Title from '@/components/Partials/Title.vue';
         </div>
     </div>
 </div>
+
+
 </template>
 
 <style scoped>
@@ -96,7 +121,6 @@ import Title from '@/components/Partials/Title.vue';
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
 }
 

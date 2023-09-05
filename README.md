@@ -1,6 +1,6 @@
 # Ticket Management App
 
-This is a web application designed to manage and track Tickets  the applictaion called Tickets Flow Plus.
+This is a web application designed to manage and track Tickets  the applictaion called Tickets Flow .
 
 ## Features
 
@@ -17,19 +17,26 @@ This is a web application designed to manage and track Tickets  the applictaion 
 
 ## Installation
 
+### Root 
+
+1. Go to the root folder `TICKETS-FLOW` 
+2. Run `npm install` to install dependencies.
+
 ### Frontend
 
-1. Navigate to the `Issue-Trackr-Pro-clientSide` directory.
+1. Navigate to the `Tickets-Flow-clientSide` directory.
 2. Run `npm install` to install dependencies.
-3. Run `npm run serve` to start the development server.
 
 ### Backend
 
-1. Navigate to the `Issue-Trackr-pro-serverSide` directory.
+1. Navigate to the `Tickets-Flow-serverSide` directory.
 2. Run `npm install` to install dependencies.
 3. Set up your MySQL database and update `.env` with the database details.
-4. Run `npm start` to start the backend server using (nodemone).
 
+## Run The project 
+
+1. Go Back to the root folder `TICKETS-FLOW` 
+2. Run `npm run dev` to run  the both Client and Server Side with one command 
 
 
 ## Contributing

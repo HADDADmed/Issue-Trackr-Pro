@@ -105,7 +105,7 @@ body {
 }
 
 .bg {
-  background-image: url('wallpaperflare.com_wallpaper.jpg');
+  /* background-image: url('wallpaperflare.com_wallpaper.jpg'); */
   background-size: cover;
   color: #fff;
   text-align: center;

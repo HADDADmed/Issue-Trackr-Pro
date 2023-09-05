@@ -47,7 +47,6 @@ async function fetchIssues() {
       response = await fetch('http://localhost:8000/api/tickets/' + userId);
       title.value = 'List of all Tickets' ;
       subtitle.value = 'of user with id : #' + userId + ' and name : ' + getUserNameById(userId);
-
     } else {
       response = await fetch('http://localhost:8000/api/tickets');
       title.value = 'List of all Tickets';
@@ -155,7 +154,7 @@ const ticket = ref({
     
 });
 
-const ticket_id = ref(0);
+var ticket_id = ref(0);
 var statusIndex = ref(0);
 var actualStatus = ref('');
 
@@ -166,7 +165,7 @@ let isVisible = ref(false);
 // function to ppen the pop up model 
 function openModal(id) {
       ticket_id = id;
-     isVisible.value = true;
+     isVisible.value = true; 
      onMounted(async () => {
   try {
     const ticketResponse = await axios.get(`http://localhost:8000/api/tickets/ticket/${ticket_id}`);
@@ -581,6 +580,7 @@ import Title from '../Partials/Title.vue';
   background-color: white;
   border: 1px solid #ccc;
   padding: 10px;
+  
 }
 .hoverC:hover {
   opacity: 1;
